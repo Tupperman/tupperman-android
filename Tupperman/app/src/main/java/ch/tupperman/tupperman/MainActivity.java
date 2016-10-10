@@ -119,6 +119,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        if(newText.length() == 0){
+            fragment.myTupperRecyclerViewAdapter.getFilter().filter("");
+        }
         return false;
     }
 }

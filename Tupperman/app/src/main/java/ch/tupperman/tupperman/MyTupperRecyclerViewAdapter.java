@@ -23,11 +23,13 @@ import java.util.List;
 public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRecyclerViewAdapter.ViewHolder> implements Filterable {
 
     private List<DummyItem> mValues = new ArrayList<>();
+    private List<DummyItem> mOriginalValues = new ArrayList<>();
     private final OnListFragmentInteractionListener mListener;
 
 
     public MyTupperRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
+        mOriginalValues = items;
         mListener = listener;
     }
 
@@ -81,8 +83,9 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 List<DummyItem> filteredResults = new ArrayList<>();
+
                 if (constraint.length() == 0) {
-                    filteredResults = mValues;
+                    filteredResults = mOriginalValues;
                 } else {
 
                     for(DummyItem dummyItem: mValues){
