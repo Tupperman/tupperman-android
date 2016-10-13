@@ -1,10 +1,15 @@
 package ch.tupperman.tupperman;
 
+import android.app.IntentService;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -20,13 +25,17 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import ch.tupperman.tupperman.dummy.DummyContent;
+import ch.tupperman.tupperman.services.TupperReceiver;
+import ch.tupperman.tupperman.services.TupperService;
 import layout.SettingsFragment;
 import layout.TupperFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener  {
+        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
     private TupperFragment fragment = null;
+    private Intent mServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +61,20 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+        mServiceIntent = new Intent(MainActivity.this, TupperService.class);
+        this.startService(mServiceIntent);
+
+        IntentFilter mStatusIntentFilter = new IntentFilter("ch.tupperman.tupperman.rest");
+        TupperReceiver mTupperReceiver = new TupperReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
+
+
         fragment = TupperFragment.newInstance(1);
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+
+
     }
 
     @Override
@@ -119,9 +139,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(newText.length() == 0){
+        if (newText.length() == 0) {
             fragment.myTupperRecyclerViewAdapter.getFilter().filter("");
         }
         return false;
     }
+
 }
