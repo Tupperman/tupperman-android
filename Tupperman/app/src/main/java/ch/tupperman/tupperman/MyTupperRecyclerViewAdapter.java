@@ -4,12 +4,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import layout.TupperFragment.OnListFragmentInteractionListener;
 import ch.tupperman.tupperman.dummy.DummyContent.DummyItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,14 +20,21 @@ import java.util.List;
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRecyclerViewAdapter.ViewHolder> {
+public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    private final List<DummyItem> mValues;
+    private List<DummyItem> mValues = new ArrayList<>();
+    private List<DummyItem> mOriginalValues = new ArrayList<>();
     private final OnListFragmentInteractionListener mListener;
+
 
     public MyTupperRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
+        mOriginalValues = items;
         mListener = listener;
+    }
+
+    public void setmValues(List<DummyItem> list){
+        mValues = list;
     }
 
     @Override
@@ -32,6 +42,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_tupper, parent, false);
         return new ViewHolder(view);
+
     }
 
     @Override
@@ -56,6 +67,39 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                mValues = (List<DummyItem>) results.values;
+                MyTupperRecyclerViewAdapter.this.notifyDataSetChanged();
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<DummyItem> filteredResults = new ArrayList<>();
+
+                if (constraint.length() == 0) {
+                    filteredResults = mOriginalValues;
+                } else {
+
+                    for(DummyItem dummyItem: mValues){
+                        if(dummyItem.content.toLowerCase().contains(constraint)){
+                            filteredResults.add(dummyItem);
+                        }
+                    }
+
+                }
+                FilterResults results = new FilterResults();
+                results.values = filteredResults;
+                return results;
+            }
+        };
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -3,12 +3,17 @@ package layout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import ch.tupperman.tupperman.MyTupperRecyclerViewAdapter;
 import ch.tupperman.tupperman.R;
@@ -28,6 +33,7 @@ public class TupperFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    public MyTupperRecyclerViewAdapter myTupperRecyclerViewAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -53,6 +59,8 @@ public class TupperFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
+
     }
 
     @Override
@@ -69,7 +77,9 @@ public class TupperFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyTupperRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(DummyContent.ITEMS, mListener);
+            recyclerView.setAdapter(myTupperRecyclerViewAdapter);
+
         }
         return view;
     }

@@ -16,4 +16,5 @@
     <string name="subtitle">The Tupperware managing app</string>
     <string name="details_description">Description</string>
     <string name="details_uuid">UUID</string>
+    <string name="hint_search">Search</string>
 </resources>
