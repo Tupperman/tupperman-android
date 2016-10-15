@@ -16,12 +16,6 @@ import ch.tupperman.tupperman.MyTupperRecyclerViewAdapter;
 import ch.tupperman.tupperman.R;
 import ch.tupperman.tupperman.models.Tupper;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class TupperFragment extends Fragment {
 
     // TODO: Customize parameter argument names
@@ -32,10 +26,6 @@ public class TupperFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     public MyTupperRecyclerViewAdapter myTupperRecyclerViewAdapter;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public TupperFragment() {
     }
 

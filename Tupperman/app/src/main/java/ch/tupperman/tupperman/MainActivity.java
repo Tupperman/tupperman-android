@@ -72,8 +72,6 @@ public class MainActivity extends AppCompatActivity
         setTuppers();
 
 
-
-
     }
 
     @Override
@@ -149,13 +147,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(JSONObject jsonObject) {
                 JsonParser jsonParser = new JsonParser();
-                JsonObject gsonObject = (JsonObject)jsonParser.parse(jsonObject.toString());
-                Type listType = new TypeToken<ArrayList<Tupper>>(){}.getType();
+                JsonObject gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
+                Type listType = new TypeToken<ArrayList<Tupper>>() {
+                }.getType();
                 List<Tupper> tupperList = new Gson().fromJson(gsonObject.get("tuppers"), listType);
                 fragment = TupperFragment.newInstance(tupperList);
                 FragmentManager manager = getSupportFragmentManager();
                 manager.beginTransaction().replace(R.id.content_main, fragment).commit();
-                Toast.makeText(MainActivity.this, tupperList.get(0).toString(), Toast.LENGTH_LONG).show();
             }
 
             @Override

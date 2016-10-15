@@ -48,8 +48,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mTitleView.setText(mValues.get(position).getId());
-        holder.mDescriptionView.setText(mValues.get(position).getName());
+        holder.mTitleView.setText(mValues.get(position).getName());
+        holder.mDescriptionView.setText(mValues.get(position).getDescription());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
