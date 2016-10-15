@@ -18,9 +18,7 @@ import ch.tupperman.tupperman.models.Tupper;
 
 public class TupperFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private List<Tupper> tuppers;
     private OnListFragmentInteractionListener mListener;
@@ -29,8 +27,6 @@ public class TupperFragment extends Fragment {
     public TupperFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static TupperFragment newInstance(List<Tupper> tuppers) {
         TupperFragment fragment = new TupperFragment();
         fragment.tuppers = tuppers;
@@ -47,7 +43,7 @@ public class TupperFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
-
+        setRetainInstance(true);
 
     }
 
@@ -56,7 +52,6 @@ public class TupperFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tupper_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
@@ -90,18 +85,7 @@ public class TupperFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Tupper item);
     }
 }
