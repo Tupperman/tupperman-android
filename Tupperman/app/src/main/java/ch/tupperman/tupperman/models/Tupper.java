@@ -1,5 +1,7 @@
 package ch.tupperman.tupperman.models;
 
+import android.util.EventLogTags;
+
 import java.util.Date;
 
 public class Tupper {
@@ -54,4 +56,7 @@ public class Tupper {
         this.dateOfFreeze = dateOfFreeze;
     }
 
+    public String toString(){
+        return "Name: " + name + ", Description: "+ description;
+    }
 }

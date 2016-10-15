@@ -18,13 +18,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONObject;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.ServerCallback;
-import ch.tupperman.tupperman.dummy.DummyContent;
+import ch.tupperman.tupperman.models.Tupper;
 import layout.SettingsFragment;
 import layout.TupperFragment;
+
+import com.google.gson.JsonObject;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
@@ -60,9 +71,7 @@ public class MainActivity extends AppCompatActivity
         serverCall = new ServerCall(MainActivity.this);
         setTuppers();
 
-        fragment = TupperFragment.newInstance(1);
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+
 
 
     }
@@ -86,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_scanner) {
             // Transaction to scanner, once the lib is found
         } else if (id == R.id.nav_tupperlist) {
-            TupperFragment fragment = TupperFragment.newInstance(1);
+            TupperFragment fragment = TupperFragment.newInstance(null);
             FragmentManager manager = getSupportFragmentManager();
             manager.beginTransaction().replace(R.id.content_main, fragment).commit();
         } else if (id == R.id.nav_settings) {
@@ -112,7 +121,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(Tupper item) {
 
     }
 
@@ -138,8 +147,20 @@ public class MainActivity extends AppCompatActivity
     private void setTuppers() {
         serverCall.getTuppers(new ServerCallback() {
             @Override
-            public void onSuccess(JSONObject result) {
-                Toast.makeText(MainActivity.this, result.toString(), Toast.LENGTH_LONG).show();
+            public void onSuccess(JSONObject jsonObject) {
+                JsonParser jsonParser = new JsonParser();
+                JsonObject gsonObject = (JsonObject)jsonParser.parse(jsonObject.toString());
+                Type listType = new TypeToken<ArrayList<Tupper>>(){}.getType();
+                List<Tupper> tupperList = new Gson().fromJson(gsonObject.get("tuppers"), listType);
+                fragment = TupperFragment.newInstance(tupperList);
+                FragmentManager manager = getSupportFragmentManager();
+                manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+                Toast.makeText(MainActivity.this, tupperList.get(0).toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }

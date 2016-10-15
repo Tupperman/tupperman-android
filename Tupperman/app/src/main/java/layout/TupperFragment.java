@@ -3,22 +3,18 @@ package layout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import java.util.List;
 
 import ch.tupperman.tupperman.MyTupperRecyclerViewAdapter;
 import ch.tupperman.tupperman.R;
-import ch.tupperman.tupperman.dummy.DummyContent;
-import ch.tupperman.tupperman.dummy.DummyContent.DummyItem;
+import ch.tupperman.tupperman.models.Tupper;
 
 /**
  * A fragment representing a list of Items.
@@ -32,6 +28,7 @@ public class TupperFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private List<Tupper> tuppers;
     private OnListFragmentInteractionListener mListener;
     public MyTupperRecyclerViewAdapter myTupperRecyclerViewAdapter;
 
@@ -44,10 +41,11 @@ public class TupperFragment extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static TupperFragment newInstance(int columnCount) {
+    public static TupperFragment newInstance(List<Tupper> tuppers) {
         TupperFragment fragment = new TupperFragment();
+        fragment.tuppers = tuppers;
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -77,7 +75,7 @@ public class TupperFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(DummyContent.ITEMS, mListener);
+            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(tuppers, mListener);
             recyclerView.setAdapter(myTupperRecyclerViewAdapter);
 
         }
@@ -114,6 +112,6 @@ public class TupperFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Tupper item);
     }
 }

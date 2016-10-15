@@ -9,31 +9,31 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ch.tupperman.tupperman.models.Tupper;
 import layout.TupperFragment.OnListFragmentInteractionListener;
-import ch.tupperman.tupperman.dummy.DummyContent.DummyItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Tupper} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    private List<DummyItem> mValues = new ArrayList<>();
-    private List<DummyItem> mOriginalValues = new ArrayList<>();
+    private List<Tupper> mValues = new ArrayList<>();
+    private List<Tupper> mOriginalValues = new ArrayList<>();
     private final OnListFragmentInteractionListener mListener;
 
 
-    public MyTupperRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyTupperRecyclerViewAdapter(List<Tupper> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mOriginalValues = items;
         mListener = listener;
     }
 
-    public void setmValues(List<DummyItem> list){
+    public void setmValues(List<Tupper> list) {
         mValues = list;
     }
 
@@ -48,9 +48,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mImgView.setImageDrawable(mValues.get(position).image);
-        holder.mTitleView.setText(mValues.get(position).id);
-        holder.mDescriptionView.setText(mValues.get(position).content);
+        holder.mTitleView.setText(mValues.get(position).getId());
+        holder.mDescriptionView.setText(mValues.get(position).getName());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,21 +75,21 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                mValues = (List<DummyItem>) results.values;
+                mValues = (List<Tupper>) results.values;
                 MyTupperRecyclerViewAdapter.this.notifyDataSetChanged();
             }
 
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                List<DummyItem> filteredResults = new ArrayList<>();
+                List<Tupper> filteredResults = new ArrayList<>();
 
                 if (constraint.length() == 0) {
                     filteredResults = mOriginalValues;
                 } else {
 
-                    for(DummyItem dummyItem: mValues){
-                        if(dummyItem.content.toLowerCase().contains(constraint)){
-                            filteredResults.add(dummyItem);
+                    for (Tupper tupper : mValues) {
+                        if (tupper.getName().toLowerCase().contains(constraint)) {
+                            filteredResults.add(tupper);
                         }
                     }
 
@@ -107,7 +106,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         public final ImageView mImgView;
         public final TextView mTitleView;
         public final TextView mDescriptionView;
-        public DummyItem mItem;
+        public Tupper mItem;
 
         public ViewHolder(View view) {
             super(view);
