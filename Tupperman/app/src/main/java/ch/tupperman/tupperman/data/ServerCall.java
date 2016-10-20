@@ -9,6 +9,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -34,7 +35,25 @@ public class ServerCall {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.onError("Server not reachable! " + error.toString());
+                callback.onError("Something went wrong during the get tuppers request!");
+            }
+        });
+        mRequestQueue.add(jsObjRequest);
+    }
+
+
+    public void createTupper(final ServerCallback callback, JSONObject tupper) throws JSONException {
+        String urlAllTuppers = url + "/api/tuppers/"+ tupper.get("id");
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, urlAllTuppers, tupper, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError("Something went wrong during the create tupper request!");
             }
         });
         mRequestQueue.add(jsObjRequest);

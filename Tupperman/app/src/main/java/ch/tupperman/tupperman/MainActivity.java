@@ -2,6 +2,7 @@ package ch.tupperman.tupperman;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -18,23 +19,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Configuration;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
+import ch.tupperman.tupperman.models.TupperFactory;
+import ch.tupperman.tupperman.models.FakeData;
 import layout.SettingsFragment;
 import layout.TupperFragment;
-
-import com.google.gson.JsonObject;
 
 
 public class MainActivity extends AppCompatActivity
@@ -47,6 +45,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Configuration.Builder config = new Configuration.Builder(this);
+        config.addModelClasses(Tupper.class);
+        ActiveAndroid.initialize(config.create());
+
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -145,21 +149,25 @@ public class MainActivity extends AppCompatActivity
 
     private void setTuppers() {
         serverCall.getTuppers(new ServerCallback() {
+            TupperFactory tupperFactory = new TupperFactory();
+
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                JsonParser jsonParser = new JsonParser();
-                JsonObject gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
-                Type listType = new TypeToken<ArrayList<Tupper>>() {
-                }.getType();
-                tupperList = new Gson().fromJson(gsonObject.get("tuppers"), listType);
-                fragment = TupperFragment.newInstance(tupperList);
-                FragmentManager manager = getSupportFragmentManager();
-                manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+                tupperList = tupperFactory.toTuppers(jsonObject);
+                loadFragment();
             }
 
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                tupperList = tupperFactory.toTuppers(new FakeData().data);
+                loadFragment();
+            }
+
+            private void loadFragment() {
+                fragment = TupperFragment.newInstance(tupperList);
+                FragmentManager manager = getSupportFragmentManager();
+                manager.beginTransaction().replace(R.id.content_main, fragment).commit();
             }
         });
     }

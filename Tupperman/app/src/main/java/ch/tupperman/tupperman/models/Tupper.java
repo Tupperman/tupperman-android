@@ -1,62 +1,34 @@
 package ch.tupperman.tupperman.models;
 
-import android.util.EventLogTags;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 
 import java.util.Date;
 
-public class Tupper {
-    private String id;
-    private String name;
-    private String description;
-    private String foodGroup;
-    private Date dateOfFreeze;
+@Table(name = "Tuppers")
+public class Tupper extends Model {
+    public Tupper(){
+        super();
+    }
+    @Column(name = "Id")
+    public String id;
 
-    public Tupper(String name, String description){
+    @Column(name = "name")
+    public String name;
+
+    @Column(name = "Description")
+    public String description;
+
+    @Column(name = "FoodGroup")
+    public String foodGroup;
+
+    @Column(name = "DateOfFreeze")
+    public Date dateOfFreeze;
+
+    public Tupper(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFoodGroup() {
-        return foodGroup;
-    }
-
-    public void setFoodGroup(String foodGroup) {
-        this.foodGroup = foodGroup;
-    }
-
-    public Date getDateOfFreeze() {
-        return dateOfFreeze;
-    }
-
-    public void setDateOfFreeze(Date dateOfFreeze) {
-        this.dateOfFreeze = dateOfFreeze;
-    }
-
-    public String toString(){
-        return "Name: " + name + ", Description: "+ description;
     }
 }

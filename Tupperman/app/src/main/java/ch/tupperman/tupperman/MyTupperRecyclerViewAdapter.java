@@ -48,8 +48,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mTitleView.setText(mValues.get(position).getName());
-        holder.mDescriptionView.setText(mValues.get(position).getDescription());
+        holder.mTitleView.setText(mValues.get(position).name);
+        holder.mDescriptionView.setText(mValues.get(position).description);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +88,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
                 } else {
 
                     for (Tupper tupper : mValues) {
-                        if (tupper.getName().toLowerCase().contains(constraint)) {
+                        if (tupper.name.toLowerCase().contains(constraint)) {
                             filteredResults.add(tupper);
                         }
                     }
