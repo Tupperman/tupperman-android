@@ -5,14 +5,15 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Table(name = "Tuppers")
-public class Tupper extends Model {
+public class Tupper extends Model implements Serializable {
     public Tupper(){
         super();
     }
-    @Column(name = "Id")
+    @Column(name = "uuid")
     public String id;
 
     @Column(name = "name")

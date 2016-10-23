@@ -1,5 +1,8 @@
 package ch.tupperman.tupperman;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.tupperman.tupperman.models.Tupper;
+import layout.DetailFragment;
 import layout.TupperFragment.OnListFragmentInteractionListener;
 
 import java.util.ArrayList;
@@ -25,7 +29,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     private List<Tupper> mValues = new ArrayList<>();
     private List<Tupper> mOriginalValues = new ArrayList<>();
     private final OnListFragmentInteractionListener mListener;
-
+    private Context mContext;
 
     public MyTupperRecyclerViewAdapter(List<Tupper> items, OnListFragmentInteractionListener listener) {
         mValues = items;
@@ -39,7 +43,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        mContext = parent.getContext();
+        View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.fragment_tupper, parent, false);
         return new ViewHolder(view);
 
@@ -62,6 +67,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             }
         });
     }
+
 
     @Override
     public int getItemCount() {

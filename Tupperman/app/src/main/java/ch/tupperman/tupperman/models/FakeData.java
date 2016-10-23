@@ -11,7 +11,6 @@ public class FakeData {
         String fake = "{\"tuppers\":[{\"id\":\"asdfasdf\",\"name\":\"Fleisch\", \"description\":\"gut\"}, {\"id\":\"asd\",\"name\":\"Indisch\", \"description\":\"awesome\"}]}";
         try {
             data = new JSONObject(fake);
-            System.out.println(data.toString());
         } catch (JSONException e) {
             System.out.println("error in json string");
         }

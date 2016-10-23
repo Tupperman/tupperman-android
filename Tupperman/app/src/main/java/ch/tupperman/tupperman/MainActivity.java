@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -31,12 +33,13 @@ import ch.tupperman.tupperman.data.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.models.FakeData;
+import layout.DetailFragment;
 import layout.SettingsFragment;
 import layout.TupperFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
+        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
     private TupperFragment fragment = null;
     List<Tupper> tupperList;
@@ -125,7 +128,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Tupper item) {
-
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("tupper", item);
+        detailFragment.setArguments(bundle);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_main, detailFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -146,6 +156,7 @@ public class MainActivity extends AppCompatActivity
         }
         return false;
     }
+
 
     private void setTuppers() {
         serverCall.getTuppers(new ServerCallback() {
