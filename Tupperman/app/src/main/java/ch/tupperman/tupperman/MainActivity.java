@@ -2,9 +2,12 @@ package ch.tupperman.tupperman;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -16,20 +19,41 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
-import ch.tupperman.tupperman.dummy.DummyContent;
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Configuration;
+
+import org.json.JSONObject;
+
+import java.util.List;
+
+import ch.tupperman.tupperman.data.ServerCall;
+import ch.tupperman.tupperman.data.ServerCallback;
+import ch.tupperman.tupperman.models.Tupper;
+import ch.tupperman.tupperman.models.TupperFactory;
+import ch.tupperman.tupperman.models.FakeData;
+import layout.DetailFragment;
 import layout.SettingsFragment;
 import layout.TupperFragment;
 
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener  {
+        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
     private TupperFragment fragment = null;
+    List<Tupper> tupperList;
+    private ServerCall serverCall;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Configuration.Builder config = new Configuration.Builder(this);
+        config.addModelClasses(Tupper.class);
+        ActiveAndroid.initialize(config.create());
+
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -52,9 +76,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        fragment = TupperFragment.newInstance(1);
-        FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+        serverCall = new ServerCall(MainActivity.this);
+        setTuppers();
+
+
     }
 
     @Override
@@ -76,7 +101,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_scanner) {
             // Transaction to scanner, once the lib is found
         } else if (id == R.id.nav_tupperlist) {
-            TupperFragment fragment = TupperFragment.newInstance(1);
+            TupperFragment fragment = TupperFragment.newInstance(tupperList);
             FragmentManager manager = getSupportFragmentManager();
             manager.beginTransaction().replace(R.id.content_main, fragment).commit();
         } else if (id == R.id.nav_settings) {
@@ -102,8 +127,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
+    public void onListFragmentInteraction(Tupper item) {
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("tupper", item);
+        detailFragment.setArguments(bundle);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content_main, detailFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -119,9 +151,35 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(newText.length() == 0){
+        if (newText.length() == 0) {
             fragment.myTupperRecyclerViewAdapter.getFilter().filter("");
         }
         return false;
+    }
+
+
+    private void setTuppers() {
+        serverCall.getTuppers(new ServerCallback() {
+            TupperFactory tupperFactory = new TupperFactory();
+
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                tupperList = tupperFactory.toTuppers(jsonObject);
+                loadFragment();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                tupperList = tupperFactory.toTuppers(new FakeData().data);
+                loadFragment();
+            }
+
+            private void loadFragment() {
+                fragment = TupperFragment.newInstance(tupperList);
+                FragmentManager manager = getSupportFragmentManager();
+                manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+            }
+        });
     }
 }

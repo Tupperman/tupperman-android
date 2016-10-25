@@ -3,51 +3,35 @@ package layout;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import java.util.List;
 
 import ch.tupperman.tupperman.MyTupperRecyclerViewAdapter;
 import ch.tupperman.tupperman.R;
-import ch.tupperman.tupperman.dummy.DummyContent;
-import ch.tupperman.tupperman.dummy.DummyContent.DummyItem;
+import ch.tupperman.tupperman.models.Tupper;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class TupperFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
+    private List<Tupper> tuppers;
     private OnListFragmentInteractionListener mListener;
     public MyTupperRecyclerViewAdapter myTupperRecyclerViewAdapter;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public TupperFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static TupperFragment newInstance(int columnCount) {
+    public static TupperFragment newInstance(List<Tupper> tuppers) {
         TupperFragment fragment = new TupperFragment();
+        fragment.tuppers = tuppers;
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,7 +43,7 @@ public class TupperFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
-
+        setRetainInstance(true);
 
     }
 
@@ -68,7 +52,6 @@ public class TupperFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tupper_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
@@ -77,7 +60,7 @@ public class TupperFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(DummyContent.ITEMS, mListener);
+            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(tuppers, mListener);
             recyclerView.setAdapter(myTupperRecyclerViewAdapter);
 
         }
@@ -102,18 +85,7 @@ public class TupperFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Tupper item);
     }
 }
