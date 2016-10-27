@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -33,11 +32,11 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
-import ch.tupperman.tupperman.models.FakeData;
 import ch.tupperman.tupperman.service.TupperReceiver;
 import ch.tupperman.tupperman.service.TupperService;
 import layout.DetailFragment;
@@ -46,22 +45,27 @@ import layout.TupperFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
+        implements FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
-    private TupperFragment fragment = null;
-    private List<Tupper> tupperList;
     private ServerCall serverCall;
     private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
+    private DataSync dataSync;
+    private FragmentManager mFragmentManager;
+    private List<Tupper> mTupperList;
+    private final String tupperFragmentName = "TUPPER_FRAGMENT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentManager.addOnBackStackChangedListener(this);
 
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
         ActiveAndroid.initialize(config.create());
 
+        dataSync = new DataSync();
         setUpTupperService();
 
         setContentView(R.layout.activity_main);
@@ -72,8 +76,14 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with add Tupper", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //if (mTupperReceiver.getIsOnline()) {
+                System.out.println("add button");
+                DetailFragment detailFragment = new DetailFragment();
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.replace(R.id.content_main, detailFragment);
+                ft.addToBackStack(null);
+                ft.commit();
+                //}
             }
         });
 
@@ -105,19 +115,15 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_scanner) {
-            // Transaction to scanner, once the lib is found
         } else if (id == R.id.nav_tupperlist) {
-            TupperFragment fragment = TupperFragment.newInstance(tupperList);
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+            TupperFragment fragment = TupperFragment.newInstance(mTupperList);
+            mFragmentManager.beginTransaction().replace(R.id.content_main, fragment, tupperFragmentName).commit();
         } else if (id == R.id.nav_settings) {
             SettingsFragment fragment = SettingsFragment.newInstance();
-            FragmentManager manager = getSupportFragmentManager();
-            manager.beginTransaction().replace(R.id.content_main, fragment).commit();
+            mFragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -128,7 +134,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
-
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
@@ -157,41 +162,38 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        fragment.myTupperRecyclerViewAdapter.getFilter().filter(query);
+        getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(query);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
         if (newText.length() == 0) {
-            fragment.myTupperRecyclerViewAdapter.getFilter().filter("");
+            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
         }
         return false;
     }
 
 
     private void setTuppers() {
+        mTupperList = dataSync.getAllTuppers();
+        loadFragment(mTupperList);
         serverCall.getTuppers(new ServerCallback() {
             TupperFactory tupperFactory = new TupperFactory();
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                tupperList = tupperFactory.toTuppers(jsonObject);
-                loadFragment();
+                List<Tupper> tupperList = tupperFactory.toTuppers(jsonObject);
+                loadFragment(tupperList);
             }
 
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                tupperList = tupperFactory.toTuppers(new FakeData().data);
-                loadFragment();
+                //tupperFactory.toTuppers(new FakeData().data);
+                //loadFragment();
             }
 
-            private void loadFragment() {
-                fragment = TupperFragment.newInstance(tupperList);
-                FragmentManager manager = getSupportFragmentManager();
-                manager.beginTransaction().replace(R.id.content_main, fragment).commit();
-            }
         });
     }
 
@@ -203,6 +205,25 @@ public class MainActivity extends AppCompatActivity
         alarm_mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 10000, pending_intent);
         mTupperReceiver = new TupperReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
+    }
+
+    private void loadFragment(List<Tupper> tupperList) {
+        TupperFragment tupperFragment = TupperFragment.newInstance(tupperList);
+        mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
+        dataSync.storeTuppers(tupperList);
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        TupperFragment currentFragment = getTupperFragment();
+        if (currentFragment != null && currentFragment.isVisible()) {
+            getTupperFragment().myTupperRecyclerViewAdapter.update(dataSync.getAllTuppers());
+            getTupperFragment().myTupperRecyclerViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private TupperFragment getTupperFragment() {
+        return (TupperFragment) mFragmentManager.findFragmentByTag("TUPPER_FRAGMENT");
     }
 }
 

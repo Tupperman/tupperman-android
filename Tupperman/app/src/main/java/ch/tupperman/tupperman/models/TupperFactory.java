@@ -14,8 +14,8 @@ public class TupperFactory {
         List<Tupper> tupperList = new ArrayList<>();
         try {
             JSONArray jsonArray = jsonTuppers.getJSONArray("tuppers");
-            for (int n = 0; n < jsonArray.length(); n++) {
-                JSONObject object = jsonArray.getJSONObject(n);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
                 Tupper tupper = new Tupper();
                 tupper.id = object.getString("id");
                 tupper.name = object.getString("name");

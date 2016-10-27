@@ -19,11 +19,6 @@ import layout.TupperFragment.OnListFragmentInteractionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link Tupper} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRecyclerViewAdapter.ViewHolder> implements Filterable {
 
     private List<Tupper> mValues = new ArrayList<>();
@@ -37,8 +32,9 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         mListener = listener;
     }
 
-    public void setmValues(List<Tupper> list) {
-        mValues = list;
+    public void update(List<Tupper> tuppers) {
+        mValues.clear();
+        mValues.addAll(tuppers);
     }
 
     @Override
@@ -60,8 +56,6 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
             }
@@ -127,4 +121,5 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             return super.toString() + " '" + mDescriptionView.getText() + "'";
         }
     }
+
 }

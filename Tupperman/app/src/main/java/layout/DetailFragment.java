@@ -41,6 +41,7 @@ public class DetailFragment extends Fragment {
         if (getArguments() != null) {
             mTupper = (Tupper) getArguments().getSerializable(ARG);
         }
+        mTupper = new Tupper();
 
     }
 
@@ -62,6 +63,7 @@ public class DetailFragment extends Fragment {
                 mTupper.name = editTextName.getText().toString();
                 mTupper.description = editTextDescription.getText().toString();
                 mTupper.save();
+
                 getActivity().onBackPressed();
             }
         });
@@ -69,12 +71,6 @@ public class DetailFragment extends Fragment {
             initializeText();
         }
         return view;
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
