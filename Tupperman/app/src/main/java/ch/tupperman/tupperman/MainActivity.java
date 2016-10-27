@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //if (mTupperReceiver.getIsOnline()) {
-                System.out.println("add button");
                 DetailFragment detailFragment = new DetailFragment();
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, detailFragment);
@@ -144,14 +143,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(Tupper item) {
         //if (mTupperReceiver.getIsOnline()) {
-            DetailFragment detailFragment = new DetailFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("tupper", item);
-            detailFragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.content_main, detailFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+        DetailFragment detailFragment = new DetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("tupper", item);
+        detailFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_main, detailFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
         //}
     }
 
@@ -211,6 +210,7 @@ public class MainActivity extends AppCompatActivity
         TupperFragment tupperFragment = TupperFragment.newInstance(tupperList);
         mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
         dataSync.storeTuppers(tupperList);
+        mTupperList = tupperList;
     }
 
     @Override
