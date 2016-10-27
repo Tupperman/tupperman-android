@@ -79,10 +79,10 @@ public class MainActivity extends AppCompatActivity
                 //if (mTupperReceiver.getIsOnline()) {
                 System.out.println("add button");
                 DetailFragment detailFragment = new DetailFragment();
-                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.replace(R.id.content_main, detailFragment);
-                ft.addToBackStack(null);
-                ft.commit();
+                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.content_main, detailFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 //}
             }
         });
@@ -143,16 +143,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Tupper item) {
-        if (mTupperReceiver.getIsOnline()) {
+        //if (mTupperReceiver.getIsOnline()) {
             DetailFragment detailFragment = new DetailFragment();
             Bundle bundle = new Bundle();
             bundle.putSerializable("tupper", item);
             detailFragment.setArguments(bundle);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_main, detailFragment);
-            ft.addToBackStack(null);
-            ft.commit();
-        }
+            FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.content_main, detailFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        //}
     }
 
     @Override
