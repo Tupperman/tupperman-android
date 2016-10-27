@@ -1,13 +1,18 @@
 package ch.tupperman.tupperman;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -33,6 +38,8 @@ import ch.tupperman.tupperman.data.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.models.FakeData;
+import ch.tupperman.tupperman.service.TupperReceiver;
+import ch.tupperman.tupperman.service.TupperService;
 import layout.DetailFragment;
 import layout.SettingsFragment;
 import layout.TupperFragment;
@@ -42,8 +49,10 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
     private TupperFragment fragment = null;
-    List<Tupper> tupperList;
+    private List<Tupper> tupperList;
     private ServerCall serverCall;
+    private Intent mServiceIntent;
+    private TupperReceiver mTupperReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,7 @@ public class MainActivity extends AppCompatActivity
         config.addModelClasses(Tupper.class);
         ActiveAndroid.initialize(config.create());
 
+        setUpTupperService();
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -128,14 +138,16 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Tupper item) {
-        DetailFragment detailFragment = new DetailFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("tupper", item);
-        detailFragment.setArguments(bundle);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.content_main, detailFragment);
-        ft.addToBackStack(null);
-        ft.commit();
+        if (mTupperReceiver.getIsOnline()) {
+            DetailFragment detailFragment = new DetailFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("tupper", item);
+            detailFragment.setArguments(bundle);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_main, detailFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
     }
 
     @Override
@@ -182,4 +194,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
+    private void setUpTupperService() {
+        mServiceIntent = new Intent(MainActivity.this, TupperService.class);
+        IntentFilter mStatusIntentFilter = new IntentFilter("ch.tupperman.tupperman.rest");
+        PendingIntent pending_intent = PendingIntent.getService(this, 0, mServiceIntent, 0);
+        AlarmManager alarm_mgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarm_mgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 10000, pending_intent);
+        mTupperReceiver = new TupperReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
+    }
 }
+
