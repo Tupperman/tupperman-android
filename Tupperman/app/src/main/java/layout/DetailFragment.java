@@ -1,7 +1,6 @@
 package layout;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,7 +23,6 @@ public class DetailFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public DetailFragment() {
-        // Required empty public constructor
     }
 
     public static DetailFragment newInstance(Tupper tupper) {
@@ -64,6 +62,7 @@ public class DetailFragment extends Fragment {
                 mTupper.name = editTextName.getText().toString();
                 mTupper.description = editTextDescription.getText().toString();
                 mTupper.save();
+                mListener.onFragmentInteraction(mTupper);
                 getActivity().onBackPressed();
             }
         });
@@ -88,9 +87,10 @@ public class DetailFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        System.out.println("DetailFragment detach!");
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Tupper tupper);
     }
 }

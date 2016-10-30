@@ -42,8 +42,13 @@ public class ServerCall {
     }
 
 
-    public void createTupper(final ServerCallback callback, JSONObject tupper) throws JSONException {
-        String urlAllTuppers = url + "/api/tuppers/"+ tupper.get("id");
+    public void createTupper(final ServerCallback callback, JSONObject tupper) {
+        String urlAllTuppers = null;
+        try {
+            urlAllTuppers = url + "/api/tuppers/" + tupper.get("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, urlAllTuppers, tupper, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {

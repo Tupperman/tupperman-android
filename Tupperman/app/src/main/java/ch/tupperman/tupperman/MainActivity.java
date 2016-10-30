@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
@@ -45,9 +44,8 @@ import layout.TupperFragment;
 
 
 public class MainActivity extends AppCompatActivity
-        implements FragmentManager.OnBackStackChangedListener, NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
+        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
 
-    private ServerCall serverCall;
     private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
     private DataSync dataSync;
@@ -59,7 +57,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mFragmentManager = getSupportFragmentManager();
-        mFragmentManager.addOnBackStackChangedListener(this);
 
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
@@ -95,7 +92,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        serverCall = new ServerCall(MainActivity.this);
         setTuppers();
 
 
@@ -136,7 +132,6 @@ public class MainActivity extends AppCompatActivity
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setOnQueryTextListener(this);
-
         return true;
     }
 
@@ -152,11 +147,6 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
         //}
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override
@@ -176,21 +166,20 @@ public class MainActivity extends AppCompatActivity
 
     private void setTuppers() {
         mTupperList = dataSync.getAllTuppers();
-        loadFragment(mTupperList);
+        loadFragment();
+        ServerCall serverCall = new ServerCall(MainActivity.this);
         serverCall.getTuppers(new ServerCallback() {
             TupperFactory tupperFactory = new TupperFactory();
 
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                List<Tupper> tupperList = tupperFactory.toTuppers(jsonObject);
-                loadFragment(tupperList);
+                mTupperList = tupperFactory.toTuppers(jsonObject);
+                loadFragment();
             }
 
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                //tupperFactory.toTuppers(new FakeData().data);
-                //loadFragment();
             }
 
         });
@@ -206,24 +195,55 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
     }
 
-    private void loadFragment(List<Tupper> tupperList) {
-        TupperFragment tupperFragment = TupperFragment.newInstance(tupperList);
-        mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
-        dataSync.storeTuppers(tupperList);
-        mTupperList = tupperList;
-    }
-
-    @Override
-    public void onBackStackChanged() {
-        TupperFragment currentFragment = getTupperFragment();
-        if (currentFragment != null && currentFragment.isVisible()) {
-            getTupperFragment().myTupperRecyclerViewAdapter.update(dataSync.getAllTuppers());
-            getTupperFragment().myTupperRecyclerViewAdapter.notifyDataSetChanged();
+    private void loadFragment() {
+        TupperFragment tupperFragment = getTupperFragment();
+        if (tupperFragment == null) {
+            tupperFragment = TupperFragment.newInstance(mTupperList);
+            mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
+        } else {
+            tupperFragment.myTupperRecyclerViewAdapter.update(mTupperList);
+            tupperFragment.myTupperRecyclerViewAdapter.notifyDataSetChanged();
+            mFragmentManager.beginTransaction().show(tupperFragment).commit();
+            System.out.println("show!");
         }
     }
 
+
     private TupperFragment getTupperFragment() {
         return (TupperFragment) mFragmentManager.findFragmentByTag("TUPPER_FRAGMENT");
+    }
+
+    public void updateTupperList(Tupper tupper) {
+        int tupperIndex = mTupperList.indexOf(tupper);
+        if (tupperIndex == -1) {
+            mTupperList.add(tupper);
+        } else {
+            mTupperList.remove(tupperIndex);
+            mTupperList.add(tupper);
+        }
+        loadFragment();
+        create(tupper);
+    }
+
+    private void create(Tupper tupper) {
+        ServerCall serverCall = new ServerCall(MainActivity.this);
+        serverCall.createTupper(new ServerCallback() {
+            @Override
+            public void onSuccess(JSONObject jsonObject) {
+                Toast.makeText(MainActivity.this, jsonObject.toString(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(String message) {
+                System.out.println(message);
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, tupper.toJSON());
+    }
+
+    @Override
+    public void onFragmentInteraction(Tupper tupper) {
+        updateTupperList(tupper);
     }
 }
 

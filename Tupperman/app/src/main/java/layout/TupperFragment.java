@@ -83,9 +83,10 @@ public class TupperFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        System.out.println("TupperFragment detach!");
     }
 
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Tupper item);
+        void onListFragmentInteraction(Tupper tupper);
     }
 }
