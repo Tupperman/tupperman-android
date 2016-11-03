@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -170,10 +171,14 @@ public class MainActivity extends AppCompatActivity
         ServerCall serverCall = new ServerCall(MainActivity.this);
         serverCall.getTuppers(new ServerCallback() {
             TupperFactory tupperFactory = new TupperFactory();
-
             @Override
             public void onSuccess(JSONObject jsonObject) {
-                mTupperList = tupperFactory.toTuppers(jsonObject);
+
+            }
+
+            @Override
+            public void onSuccessArray(JSONArray jsonArray) {
+                mTupperList = tupperFactory.toTuppers(jsonArray);
                 loadFragment();
             }
 
@@ -232,6 +237,12 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(JSONObject jsonObject) {
                 Toast.makeText(MainActivity.this, jsonObject.toString(), Toast.LENGTH_LONG).show();
             }
+
+            @Override
+            public void onSuccessArray(JSONArray jsonObject) {
+
+            }
+
 
             @Override
             public void onError(String message) {

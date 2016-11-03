@@ -10,12 +10,11 @@ import java.util.List;
 
 public class TupperFactory {
 
-    public List<Tupper> toTuppers(JSONObject jsonTuppers) {
+    public List<Tupper> toTuppers(JSONArray jsonTuppers) {
         List<Tupper> tupperList = new ArrayList<>();
         try {
-            JSONArray jsonArray = jsonTuppers.getJSONArray("tuppers");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject object = jsonArray.getJSONObject(i);
+            for (int i = 0; i < jsonTuppers.length(); i++) {
+                JSONObject object = jsonTuppers.getJSONObject(i);
                 Tupper tupper = new Tupper();
                 tupper.id = object.getString("id");
                 tupper.name = object.getString("name");
