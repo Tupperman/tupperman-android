@@ -14,9 +14,9 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import ch.tupperman.tupperman.data.callbacks.CreateTupperCallback;
+import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
+import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
-import ch.tupperman.tupperman.data.callbacks.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 
@@ -42,8 +42,8 @@ public class ServerCall {
     }
 
     public void getTuppers(final GetTuppersCallback callback) {
-        String urlAllTuppers = mUrl + "tuppers";
-        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, urlAllTuppers, null, mToken, new Response.Listener<JSONArray>() {
+        String url = mUrl + "tuppers/";
+        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, mToken, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 List<Tupper> tuppers = mTupperFactory.toTuppers(response);
@@ -61,15 +61,14 @@ public class ServerCall {
     }
 
 
-    public void createTupper(final CreateTupperCallback callback, final JSONObject tupper) {
-        String urlAllTuppers = mUrl + "tuppers/";
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, urlAllTuppers, tupper, mToken, new Response.Listener<JSONObject>() {
+    public void createOrUpdateTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper) {
+        String url = mUrl + "tuppers/";
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), mToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
             }
         }, new Response.ErrorListener() {
-
             @Override
             public void onErrorResponse(VolleyError error) {
                 callback.onError("Something went wrong during the create tupper request!");
@@ -78,4 +77,22 @@ public class ServerCall {
         });
         mRequestQueue.add(jsObjRequest);
     }
+
+    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
+        String url = mUrl + "tuppers/" + tupper.uuid;
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), mToken, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.onSuccess();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError("Something went wrong during the create tupper request!");
+                Log.e(TAG, "createTupper: " + error.toString());
+            }
+        });
+        mRequestQueue.add(jsObjRequest);
+    }
+
 }
