@@ -34,6 +34,8 @@ import java.util.List;
 
 import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
+import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
+import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.service.TupperReceiver;
@@ -168,25 +170,17 @@ public class MainActivity extends AppCompatActivity
         mTupperList = dataSync.getAllTuppers();
         loadFragment();
         ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.getTuppers(new ServerCallback() {
+        serverCall.getTuppers(new GetTuppersCallback() {
             TupperFactory tupperFactory = new TupperFactory();
-
             @Override
-            public void onSuccess(JSONObject jsonObject) {
-
-            }
-
-            @Override
-            public void onSuccessArray(JSONArray jsonArray) {
-                mTupperList = tupperFactory.toTuppers(jsonArray);
+            public void onSuccess(List<Tupper> tuppers) {
+                mTupperList = tuppers;
                 loadFragment();
             }
-
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-
         });
     }
 
@@ -227,26 +221,34 @@ public class MainActivity extends AppCompatActivity
         loadFragment();
     }
 
-    private void create(Tupper tupper) {
+    private void update(final Tupper tupper){
         ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.createTupper(new ServerCallback() {
+        serverCall.createOrUpdateTupper(new CreateOrUpdateTupperCallback() {
             @Override
-            public void onSuccess(JSONObject jsonObject) {
-                Toast.makeText(MainActivity.this, jsonObject.toString(), Toast.LENGTH_LONG).show();
+            public void onSuccess() {
             }
-
-            @Override
-            public void onSuccessArray(JSONArray jsonObject) {
-
-            }
-
 
             @Override
             public void onError(String message) {
-                System.out.println(message);
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper.toJSON());
+        }, tupper);
+
+    }
+
+    private void create(final Tupper tupper) {
+        ServerCall serverCall = new ServerCall(MainActivity.this);
+        serverCall.createOrUpdateTupper(new CreateOrUpdateTupperCallback() {
+            @Override
+            public void onSuccess() {
+                mTupperList.add(tupper);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, tupper);
     }
 
     @Override
