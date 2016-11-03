@@ -19,6 +19,7 @@ public class DetailFragment extends Fragment {
     private Tupper mTupper;
     private EditText editTextDescription;
     private EditText editTextName;
+    private boolean isCreate;
 
     private OnFragmentInteractionListener mListener;
 
@@ -38,8 +39,10 @@ public class DetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mTupper = (Tupper) getArguments().getSerializable(ARG);
+            isCreate = false;
         } else {
             mTupper = new Tupper();
+            isCreate = true;
         }
 
     }
@@ -62,7 +65,11 @@ public class DetailFragment extends Fragment {
                 mTupper.name = editTextName.getText().toString();
                 mTupper.description = editTextDescription.getText().toString();
                 mTupper.save();
-                mListener.onFragmentInteraction(mTupper);
+                if(isCreate){
+                    mListener.onCreate(mTupper);
+                }else {
+                    mListener.onUpdate(mTupper);
+                }
                 getActivity().onBackPressed();
             }
         });
@@ -91,6 +98,7 @@ public class DetailFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Tupper tupper);
+        void onCreate(Tupper tupper);
+        void onUpdate(Tupper tupper);
     }
 }

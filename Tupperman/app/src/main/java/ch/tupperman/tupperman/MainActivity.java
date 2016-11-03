@@ -251,9 +251,20 @@ public class MainActivity extends AppCompatActivity
         }, tupper);
     }
 
+
+    @Override
+    public void onCreate(Tupper tupper) {
+        create(tupper);
+    }
+
+    @Override
+    public void onUpdate(Tupper tupper) {
+        update(tupper);
+    }
+
     @Override
     public void onFragmentInteraction(Tupper tupper) {
-        updateTupperList(tupper);
+
     }
 }
 
