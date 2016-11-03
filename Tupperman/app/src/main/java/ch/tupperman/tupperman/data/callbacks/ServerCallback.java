@@ -1,4 +1,4 @@
-package ch.tupperman.tupperman.data;
+package ch.tupperman.tupperman.data.callbacks;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -14,16 +14,25 @@ public class TupperFactory {
         List<Tupper> tupperList = new ArrayList<>();
         try {
             for (int i = 0; i < jsonTuppers.length(); i++) {
-                JSONObject object = jsonTuppers.getJSONObject(i);
-                Tupper tupper = new Tupper();
-                tupper.uuid = object.getString("uuid");
-                tupper.name = object.getString("name");
-                tupper.description = object.getString("description");
+                JSONObject jsonTupper = jsonTuppers.getJSONObject(i);
+                Tupper tupper = toTupper(jsonTupper);
                 tupperList.add(tupper);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return tupperList;
+    }
+
+    public Tupper toTupper(JSONObject jsonTupper) {
+        Tupper tupper = new Tupper();
+        try {
+            tupper.uuid = jsonTupper.getString("uuid");
+            tupper.name = jsonTupper.getString("name");
+            tupper.description = jsonTupper.getString("description");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return tupper;
     }
 }

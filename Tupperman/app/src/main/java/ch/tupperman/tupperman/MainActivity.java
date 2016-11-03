@@ -34,7 +34,7 @@ import java.util.List;
 
 import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
-import ch.tupperman.tupperman.data.ServerCallback;
+import ch.tupperman.tupperman.data.callbacks.ServerCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.service.TupperReceiver;
