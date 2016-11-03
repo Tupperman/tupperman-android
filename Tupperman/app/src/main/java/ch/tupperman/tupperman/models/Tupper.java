@@ -23,7 +23,10 @@ public class Tupper extends Model implements Serializable {
     @Column(name = "name")
     public String name;
 
-    @Column(name = "Description")
+    @Column(name = "weight")
+    public int weight;
+
+    @Column(name = "description")
     public String description;
 
     @Column(name = "FoodGroup")
@@ -39,9 +42,13 @@ public class Tupper extends Model implements Serializable {
     public JSONObject toJSON(){
         try {
             JSONObject jsonTupper = new JSONObject();
-            jsonTupper.put("id", id);
+            jsonTupper.put("uuid", "12345");
             jsonTupper.put("name", name);
             jsonTupper.put("description", description);
+            jsonTupper.put("weight", 42);
+            jsonTupper.put("foodGroups", "Vegan :-P");
+            jsonTupper.put("freezeDate", "2016-11-11 11:11:11.111 +00:00");
+            jsonTupper.put("expiryDate", "2017-11-11 11:11:11.111 +00:00");
             return jsonTupper;
         } catch (JSONException e) {
             e.printStackTrace();

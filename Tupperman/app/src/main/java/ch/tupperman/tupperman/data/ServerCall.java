@@ -15,7 +15,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-
 public class ServerCall {
     private static final String TAG = "ServerCall";
     private String mUrl = "http://ark-5.citrin.ch:9080/api/"; //SET YOUR OWN IP AND RUN THE TUPPERMAN SERVER
@@ -46,7 +45,6 @@ public class ServerCall {
             @Override
             public void onErrorResponse(VolleyError error) {
                 callback.onError("Something went wrong during the get tuppers request!");
-                System.out.println("error Tuppers: " + error.toString());
                 Log.e(TAG, error.toString());
             }
         });
@@ -55,13 +53,8 @@ public class ServerCall {
 
 
     public void createTupper(final ServerCallback callback, JSONObject tupper) {
-        String urlAllTuppers = null;
-        try {
-            urlAllTuppers = mUrl + "tuppers/" + tupper.get("id");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, urlAllTuppers, tupper, new Response.Listener<JSONObject>() {
+        String urlAllTuppers = urlAllTuppers = mUrl + "tuppers/";
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, urlAllTuppers, tupper, mToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess(response);
@@ -71,8 +64,7 @@ public class ServerCall {
             @Override
             public void onErrorResponse(VolleyError error) {
                 callback.onError("Something went wrong during the create tupper request!");
-                System.out.println("error Tupper: " + error.toString());
-                Log.e(TAG, error.toString());
+                Log.e(TAG, "createTupper: " + error.toString());
             }
         });
         mRequestQueue.add(jsObjRequest);
