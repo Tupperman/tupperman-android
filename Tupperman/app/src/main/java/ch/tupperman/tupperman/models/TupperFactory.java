@@ -16,7 +16,7 @@ public class TupperFactory {
             for (int i = 0; i < jsonTuppers.length(); i++) {
                 JSONObject object = jsonTuppers.getJSONObject(i);
                 Tupper tupper = new Tupper();
-                tupper.id = object.getString("id");
+                tupper.uuid = object.getString("uuid");
                 tupper.name = object.getString("name");
                 tupper.description = object.getString("description");
                 tupperList.add(tupper);

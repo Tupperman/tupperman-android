@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity
         ServerCall serverCall = new ServerCall(MainActivity.this);
         serverCall.getTuppers(new ServerCallback() {
             TupperFactory tupperFactory = new TupperFactory();
+
             @Override
             public void onSuccess(JSONObject jsonObject) {
 
@@ -206,7 +207,7 @@ public class MainActivity extends AppCompatActivity
             tupperFragment = TupperFragment.newInstance(mTupperList);
             mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
         } else {
-            tupperFragment.myTupperRecyclerViewAdapter.update(mTupperList);
+            //tupperFragment.myTupperRecyclerViewAdapter.update(mTupperList);
             tupperFragment.myTupperRecyclerViewAdapter.notifyDataSetChanged();
             mFragmentManager.beginTransaction().show(tupperFragment).commit();
             System.out.println("show!");
@@ -222,12 +223,9 @@ public class MainActivity extends AppCompatActivity
         int tupperIndex = mTupperList.indexOf(tupper);
         if (tupperIndex == -1) {
             mTupperList.add(tupper);
-        } else {
-            mTupperList.remove(tupperIndex);
-            mTupperList.add(tupper);
         }
-        loadFragment();
         create(tupper);
+        loadFragment();
     }
 
     private void create(Tupper tupper) {

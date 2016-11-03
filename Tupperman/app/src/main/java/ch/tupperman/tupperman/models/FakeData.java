@@ -8,7 +8,7 @@ public class FakeData {
     public JSONObject data;
 
     public FakeData() {
-        String fake = "{\"tuppers\":[{\"id\":\"asdfasdf\",\"name\":\"Fleisch\", \"description\":\"gut\"}, {\"id\":\"asd\",\"name\":\"Indisch\", \"description\":\"awesome\"}]}";
+        String fake = "{\"tuppers\":[{\"uuid\":\"asdfasdf\",\"name\":\"Fleisch\", \"description\":\"gut\"}, {\"uuid\":\"asd\",\"name\":\"Indisch\", \"description\":\"awesome\"}]}";
         try {
             data = new JSONObject(fake);
         } catch (JSONException e) {

@@ -11,14 +11,17 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Table(name = "Tuppers")
 public class Tupper extends Model implements Serializable {
     public Tupper(){
         super();
+        UUID randomUUID = UUID.randomUUID();
+        uuid = randomUUID.toString();
     }
     @Column(name = "uuid")
-    public String id;
+    public String uuid;
 
     @Column(name = "name")
     public String name;
@@ -42,7 +45,7 @@ public class Tupper extends Model implements Serializable {
     public JSONObject toJSON(){
         try {
             JSONObject jsonTupper = new JSONObject();
-            jsonTupper.put("uuid", "12345");
+            jsonTupper.put("uuid", uuid);
             jsonTupper.put("name", name);
             jsonTupper.put("description", description);
             jsonTupper.put("weight", 42);
