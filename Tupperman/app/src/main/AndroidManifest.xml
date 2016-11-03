@@ -18,6 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity">
+        </activity>
         <service android:name=".service.TupperService"/>
         <meta-data android:name="AA_DB_NAME" android:value="Tupperman.db" />
         <meta-data android:name="AA_DB_VERSION" android:value="5" />

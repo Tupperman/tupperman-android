@@ -17,4 +17,7 @@
     <string name="details_description">Description</string>
     <string name="details_uuid">UUID</string>
     <string name="hint_search">Search</string>
+    <string name="do_login">Log in</string>
+    <string name="placeholder_password">password</string>
+    <string name="placeholder_username">email</string>
 </resources>
