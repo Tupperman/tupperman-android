@@ -2,27 +2,33 @@ package layout;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import ch.tupperman.tupperman.R;
 import ch.tupperman.tupperman.models.Tupper;
 
 
-public class DetailFragment extends Fragment {
+public class DetailFragment extends Fragment implements DatePickerFragment.OnDateChosenListener {
     private static final String ARG = "tupper";
 
     private Tupper mTupper;
     private EditText editTextDescription;
     private EditText editTextName;
+    private EditText editTextWeight;
     private boolean isCreate;
-
+    private View mView;
     private OnFragmentInteractionListener mListener;
-
+    SimpleDateFormat mDateFormat;
     public DetailFragment() {
     }
 
@@ -44,40 +50,31 @@ public class DetailFragment extends Fragment {
             mTupper = new Tupper();
             isCreate = true;
         }
-
+        mDateFormat = new SimpleDateFormat("dd.MM.yyyy");
     }
 
     private void initializeText() {
         editTextDescription.setText(mTupper.description);
         editTextName.setText(mTupper.name);
+        editTextWeight.setText(Integer.toString(mTupper.weight));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_detail, container, false);
-        Button button = (Button) view.findViewById(R.id.button_save_detail);
-        editTextDescription = (EditText) view.findViewById(R.id.editText_description);
-        editTextName = (EditText) view.findViewById(R.id.editText_name);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mTupper.name = editTextName.getText().toString();
-                mTupper.description = editTextDescription.getText().toString();
-                mTupper.save();
-                if(isCreate){
-                    mListener.onCreate(mTupper);
-                }else {
-                    mListener.onUpdate(mTupper);
-                }
-                getActivity().onBackPressed();
-            }
-        });
+        mView = inflater.inflate(R.layout.fragment_detail, container, false);
+        setSaveButton();
+        setFreezeButton();
+        setExpireButton();
+        editTextDescription = (EditText) mView.findViewById(R.id.editText_description);
+        editTextName = (EditText) mView.findViewById(R.id.editText_name);
+        editTextWeight = (EditText) mView.findViewById(R.id.editText_weight);
         if (mTupper != null) {
             initializeText();
         }
-        return view;
+        return mView;
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -95,6 +92,67 @@ public class DetailFragment extends Fragment {
         super.onDetach();
         mListener = null;
         System.out.println("DetailFragment detach!");
+    }
+
+    private void setSaveButton() {
+        Button saveButton = (Button) mView.findViewById(R.id.button_save_detail);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mTupper.name = editTextName.getText().toString();
+                mTupper.description = editTextDescription.getText().toString();
+                mTupper.weight = Integer.parseInt(editTextWeight.getText().toString());
+                mTupper.save();
+                if (isCreate) {
+                    mListener.onCreate(mTupper);
+                } else {
+                    mListener.onUpdate(mTupper);
+                }
+                getActivity().onBackPressed();
+            }
+        });
+    }
+
+    private void setFreezeButton() {
+        Button freezeButton = (Button) mView.findViewById(R.id.button_freeze_detail);
+        freezeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment datePickerFragment = new DatePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("freeze", true);
+                datePickerFragment.setArguments(bundle);
+                datePickerFragment.show(getChildFragmentManager(), "datePicker");
+            }
+        });
+    }
+
+    private void setExpireButton() {
+        Button freezeButton = (Button) mView.findViewById(R.id.button_expire_detail);
+        freezeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment datePickerFragment = new DatePickerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("freeze", false);
+                datePickerFragment.setArguments(bundle);
+                datePickerFragment.show(getChildFragmentManager(), "datePicker");
+            }
+        });
+    }
+
+    @Override
+    public void onFreeze(Date date) {
+        mTupper.dateOfFreeze = date;
+        TextView freezeView = (TextView) mView.findViewById(R.id.textView_freeze);
+        freezeView.setText(mDateFormat.format(date));
+    }
+
+    @Override
+    public void onExpiry(Date date) {
+        mTupper.expiryDate = date;
+        TextView expireView = (TextView) mView.findViewById(R.id.textView_expire);
+        expireView.setText(mDateFormat.format(date));
     }
 
     public interface OnFragmentInteractionListener {

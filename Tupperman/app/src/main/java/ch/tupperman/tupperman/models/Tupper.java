@@ -38,6 +38,9 @@ public class Tupper extends Model implements Serializable {
     @Column(name = "DateOfFreeze")
     public Date dateOfFreeze;
 
+    @Column(name = "ExpiryDate")
+    public Date expiryDate;
+
     public Tupper(String name, String description) {
         this.name = name;
         this.description = description;
@@ -50,8 +53,8 @@ public class Tupper extends Model implements Serializable {
             jsonTupper.put("description", description);
             jsonTupper.put("weight", 42);
             jsonTupper.put("foodGroups", "Vegan :-P");
-            jsonTupper.put("freezeDate", "2016-11-11 11:11:11.111 +00:00");
-            jsonTupper.put("expiryDate", "2017-11-11 11:11:11.111 +00:00");
+            jsonTupper.put("freezeDate", dateOfFreeze.toString());
+            jsonTupper.put("expiryDate", expiryDate.toString());
             return jsonTupper;
         } catch (JSONException e) {
             e.printStackTrace();

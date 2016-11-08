@@ -27,9 +27,6 @@ import android.widget.Toast;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.List;
 
 import ch.tupperman.tupperman.data.DataSync;
@@ -172,11 +169,13 @@ public class MainActivity extends AppCompatActivity
         ServerCall serverCall = new ServerCall(MainActivity.this);
         serverCall.getTuppers(new GetTuppersCallback() {
             TupperFactory tupperFactory = new TupperFactory();
+
             @Override
             public void onSuccess(List<Tupper> tuppers) {
                 mTupperList = tuppers;
                 loadFragment();
             }
+
             @Override
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
@@ -221,7 +220,7 @@ public class MainActivity extends AppCompatActivity
         loadFragment();
     }
 
-    private void update(final Tupper tupper){
+    private void update(final Tupper tupper) {
         ServerCall serverCall = new ServerCall(MainActivity.this);
         serverCall.createOrUpdateTupper(new CreateOrUpdateTupperCallback() {
             @Override
