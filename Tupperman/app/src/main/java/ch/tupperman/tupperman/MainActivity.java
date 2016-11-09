@@ -40,6 +40,7 @@ import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.service.TupperReceiver;
 import ch.tupperman.tupperman.service.TupperService;
 import layout.DetailFragment;
+import layout.NoUserFragment;
 import layout.SettingsFragment;
 import layout.TupperFragment;
 
@@ -48,7 +49,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TupperFragment.OnListFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
         DetailFragment.OnFragmentInteractionListener,
-        SearchView.OnQueryTextListener {
+        SearchView.OnQueryTextListener,
+        NoUserFragment.InteractionListener {
 
     private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
@@ -77,10 +79,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mFragmentManager = getSupportFragmentManager();
         if(mAuthToken == null) {
-            startLoginActivity();
+            setNoUserFragment();
         } else {
             initialize();
         }
+    }
+
+    private void setNoUserFragment() {
+        NoUserFragment fragment = new NoUserFragment();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_main, fragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void initialize() {
@@ -121,6 +131,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void startLoginActivity() {
         final Constants.RequestCode requestType = Constants.RequestCode.LOGIN;
+        Intent loginIntent = new Intent(this, AccountManagementActivity.class);
+        loginIntent.putExtra(getString(R.string.extra_account_management_request_type), requestType);
+        startActivityForResult(loginIntent, requestType.getValue());
+    }
+
+    private void startRegistrationActivity() {
+        final Constants.RequestCode requestType = Constants.RequestCode.REGISTER;
         Intent loginIntent = new Intent(this, AccountManagementActivity.class);
         loginIntent.putExtra(getString(R.string.extra_account_management_request_type), requestType);
         startActivityForResult(loginIntent, requestType.getValue());
@@ -312,10 +329,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        updateAuthenticationToken();
+        initialize();
+    }
 
-        if(requestCode == Constants.RequestCode.LOGIN.getValue()) {
-            updateAuthenticationToken();
-        }
+    @Override
+    public void onClickLogin() {
+        startLoginActivity();
+    }
+
+    @Override
+    public void onClickRegister() {
+        startRegistrationActivity();
     }
 }
 

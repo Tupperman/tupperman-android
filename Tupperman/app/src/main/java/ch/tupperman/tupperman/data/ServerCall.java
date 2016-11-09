@@ -19,6 +19,7 @@ import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.data.callbacks.LoginCallback;
+import ch.tupperman.tupperman.data.callbacks.RegisterCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.models.User;
@@ -146,5 +147,28 @@ public class ServerCall {
             }
         });
         mRequestQueue.add(request);
+    }
+
+    /**
+     * Register a new user with the server
+     *
+     * @param callback The callback to notify on request completion
+     * @param user The user to register
+     */
+    public void register(final RegisterCallback callback, User user) {
+        final String urlRegister = mUrl + ENDPOINT_REGISTER;
+        mRequestQueue.add(new JsonObjectRequest(Request.Method.POST, urlRegister, user.toJSON(), new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.registerSuccess(response.optString("token"));
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.registerError("Registration failed");
+            }
+        }));
     }
 }

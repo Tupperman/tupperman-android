@@ -90,7 +90,7 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement InteractionListener");
         }
     }
 

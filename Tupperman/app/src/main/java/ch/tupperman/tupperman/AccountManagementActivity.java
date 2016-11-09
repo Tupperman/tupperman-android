@@ -11,35 +11,21 @@ import android.widget.Toast;
 
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.callbacks.LoginCallback;
+import ch.tupperman.tupperman.data.callbacks.RegisterCallback;
 import ch.tupperman.tupperman.models.User;
 import ch.tupperman.tupperman.Constants.RequestCode;
 import layout.LoginFragment;
+import layout.RegisterFragment;
 
-public class AccountManagementActivity extends AppCompatActivity implements LoginCallback,
-        LoginFragment.InteractionListener {
+public class AccountManagementActivity extends AppCompatActivity implements
+        LoginCallback,
+        LoginFragment.InteractionListener,
+        RegisterCallback,
+        RegisterFragment.InteractionListener{
 
     private ServerCall mServerCall;
     private Fragment mActiveFragment;
     private User mUser;
-
-    @Override
-    public void loginSuccess(String authToken) {
-        SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(getString(R.string.preferences_key_auth_token), authToken);
-        editor.putString(getString(R.string.preferences_key_email), mUser.getEmail());
-        editor.putString(getString(R.string.preferences_key_password), mUser.getPassword());
-        editor.apply();
-
-        finish();
-    }
-
-    @Override
-    public void loginError(String message) {
-        ((LoginFragment) mActiveFragment).enableUserInterface();
-        Toast.makeText(this, getString(R.string.toast_login_failed), Toast.LENGTH_LONG).show();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +40,11 @@ public class AccountManagementActivity extends AppCompatActivity implements Logi
         switch (request) {
             case LOGIN:
                 mActiveFragment = new LoginFragment();
-            default:
+                setTitle("Sign In");
+                break;
+            case REGISTER:
+                mActiveFragment = new RegisterFragment();
+                setTitle("Register");
                 break;
         }
 
@@ -70,4 +60,45 @@ public class AccountManagementActivity extends AppCompatActivity implements Logi
         ((LoginFragment) mActiveFragment).disableUserInterface();
         mServerCall.authenticate(this, mUser);
     }
+
+    @Override
+    public void loginSuccess(String authToken) {
+        storeUserInformation(authToken);
+        finish();
+    }
+
+    @Override
+    public void loginError(String message) {
+        ((LoginFragment) mActiveFragment).enableUserInterface();
+        Toast.makeText(this, getString(R.string.toast_login_failed), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClickRegister(User user) {
+        mUser = user;
+        ((RegisterFragment) mActiveFragment).disableUserInterface();
+        mServerCall.register(this, mUser);
+    }
+
+    @Override
+    public void registerSuccess(String token) {
+        mServerCall.authenticate(this, mUser);
+    }
+
+    @Override
+    public void registerError(String message) {
+        ((RegisterFragment) mActiveFragment).enableUserInterface();
+        Toast.makeText(this, getString(R.string.toast_registration_failed), Toast.LENGTH_LONG).show();
+    }
+
+    private void storeUserInformation(String token) {
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(getString(R.string.preferences_key_auth_token), token);
+        editor.putString(getString(R.string.preferences_key_email), mUser.getEmail());
+        editor.putString(getString(R.string.preferences_key_password), mUser.getPassword());
+        editor.apply();
+    }
+
 }

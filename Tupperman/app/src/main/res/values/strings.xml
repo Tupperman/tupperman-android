@@ -29,11 +29,17 @@
 
     <!-- Toasts -->
     <string name="toast_login_failed">Login failed</string>
+    <string name="toast_registration_failed">Registration failed</string>
 
     <!-- Preferences -->
     <string name="preferences_file_id">ch.tupperman.tupperman.preferences</string>
     <string name="preferences_key_auth_token">authToken</string>
     <string name="preferences_key_email">email</string>
     <string name="preferences_key_password">password</string>
+    <string name="do_register">Register</string>
+    <string name="no_user">No logged-in user</string>
+    <string name="button_login_user">Login to existing account</string>
+    <string name="or">Or</string>
+    <string name="button_register_user">Register new account</string>
 
 </resources>
