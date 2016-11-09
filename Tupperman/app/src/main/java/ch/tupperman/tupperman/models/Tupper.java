@@ -19,6 +19,8 @@ public class Tupper extends Model implements Serializable {
         super();
         UUID randomUUID = UUID.randomUUID();
         uuid = randomUUID.toString();
+        dateOfFreeze = new Date();
+        expiryDate = new Date();
     }
     @Column(name = "uuid")
     public String uuid;

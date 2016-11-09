@@ -18,6 +18,22 @@
     <string name="details_uuid">UUID</string>
     <string name="hint_search">Search</string>
     <string name="do_login">Log in</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Intent extras -->
+    <string name="extra_account_management_request_type">managementRequestType</string>
+
+    <!-- Placeholders -->
     <string name="placeholder_password">password</string>
     <string name="placeholder_username">email</string>
+
+    <!-- Toasts -->
+    <string name="toast_login_failed">Login failed</string>
+
+    <!-- Preferences -->
+    <string name="preferences_file_id">ch.tupperman.tupperman.preferences</string>
+    <string name="preferences_key_auth_token">authToken</string>
+    <string name="preferences_key_email">email</string>
+    <string name="preferences_key_password">password</string>
+
 </resources>

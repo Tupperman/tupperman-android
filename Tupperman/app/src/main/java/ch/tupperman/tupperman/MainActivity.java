@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
@@ -43,8 +44,11 @@ import layout.SettingsFragment;
 import layout.TupperFragment;
 
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TupperFragment.OnListFragmentInteractionListener, SettingsFragment.OnFragmentInteractionListener, DetailFragment.OnFragmentInteractionListener, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        TupperFragment.OnListFragmentInteractionListener,
+        SettingsFragment.OnFragmentInteractionListener,
+        DetailFragment.OnFragmentInteractionListener,
+        SearchView.OnQueryTextListener {
 
     private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
@@ -52,11 +56,12 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager mFragmentManager;
     private List<Tupper> mTupperList;
     private final String tupperFragmentName = "TUPPER_FRAGMENT";
+    private String mAuthToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFragmentManager = getSupportFragmentManager();
+        setContentView(R.layout.activity_main);
 
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
@@ -65,7 +70,17 @@ public class MainActivity extends AppCompatActivity
         dataSync = new DataSync();
         setUpTupperService();
 
-        setContentView(R.layout.activity_main);
+        updateAuthenticationToken();
+
+        mFragmentManager = getSupportFragmentManager();
+        if(mAuthToken == null) {
+            startLoginActivity();
+        } else {
+            initialize();
+        }
+    }
+
+    private void initialize() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -93,8 +108,18 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setTuppers();
+    }
 
+    private void updateAuthenticationToken() {
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
+        mAuthToken = preferences.getString(getString(R.string.preferences_key_auth_token), null);
+    }
 
+    private void startLoginActivity() {
+        final Constants.RequestCode requestType = Constants.RequestCode.LOGIN;
+        Intent loginIntent = new Intent(this, AccountManagementActivity.class);
+        loginIntent.putExtra(getString(R.string.extra_account_management_request_type), requestType);
+        startActivityForResult(loginIntent, requestType.getValue());
     }
 
     @Override
@@ -181,7 +206,7 @@ public class MainActivity extends AppCompatActivity
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        });
+        }, mAuthToken);
     }
 
     private void setUpTupperService() {
@@ -230,7 +255,7 @@ public class MainActivity extends AppCompatActivity
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper);
+        }, tupper, mAuthToken);
 
     }
 
@@ -246,7 +271,7 @@ public class MainActivity extends AppCompatActivity
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper);
+        }, tupper, mAuthToken);
     }
 
     private void delete(final Tupper tupper) {
@@ -261,7 +286,7 @@ public class MainActivity extends AppCompatActivity
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper);
+        }, tupper, mAuthToken);
     }
 
     @Override
@@ -282,6 +307,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Tupper tupper) {
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == Constants.RequestCode.LOGIN.getValue()) {
+            updateAuthenticationToken();
+        }
     }
 }
 

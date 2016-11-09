@@ -7,6 +7,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -17,6 +18,7 @@ import java.util.List;
 import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
+import ch.tupperman.tupperman.data.callbacks.LoginCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 
@@ -24,7 +26,6 @@ import ch.tupperman.tupperman.models.TupperFactory;
 public class ServerCall {
     private static final String TAG = "ServerCall";
     private String mUrl = "http://ark-5.citrin.ch:9080/api/"; //SET YOUR OWN IP AND RUN THE TUPPERMAN SERVER
-    private String mToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyYTMwYTQzMS03NDM2LTQzMWItOWZhNi1iZTdlZTFhZmJmYjAiLCJpYXQiOjE0NzgxNjMzNjAsImV4cCI6MTQ3ODI0OTc2MH0.DtyytypXZOHFnKNHbLiPW0e01k2sGCNBMzbfr1AfprA";
     private TupperFactory mTupperFactory;
     /*
     {
@@ -38,12 +39,14 @@ public class ServerCall {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(context);
         }
+
+
         mTupperFactory = new TupperFactory();
     }
 
-    public void getTuppers(final GetTuppersCallback callback) {
+    public void getTuppers(final GetTuppersCallback callback, String token) {
         String url = mUrl + "tuppers/";
-        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, mToken, new Response.Listener<JSONArray>() {
+        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, token, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 List<Tupper> tuppers = mTupperFactory.toTuppers(response);
@@ -61,9 +64,9 @@ public class ServerCall {
     }
 
 
-    public void createOrUpdateTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper) {
+    public void createOrUpdateTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper, String token) {
         String url = mUrl + "tuppers/";
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), mToken, new Response.Listener<JSONObject>() {
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), token, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -78,9 +81,9 @@ public class ServerCall {
         mRequestQueue.add(jsObjRequest);
     }
 
-    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
+    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper, String token){
         String url = mUrl + "tuppers/" + tupper.uuid;
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), mToken, new Response.Listener<JSONObject>() {
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), token, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -95,4 +98,20 @@ public class ServerCall {
         mRequestQueue.add(jsObjRequest);
     }
 
+    public void authenticate(final LoginCallback callback, JSONObject accountData) {
+        final String urlLogin = mUrl + "users/authenticate";
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, urlLogin, accountData, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                callback.onSuccess(response.optString("token"));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                callback.onError("Authentication failed");
+            }
+        });
+        mRequestQueue.add(request);
+    }
 }
