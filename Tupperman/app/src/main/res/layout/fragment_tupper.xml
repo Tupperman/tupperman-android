@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
-    android:id="@+id/card_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
     android:layout_width="fill_parent"
     android:layout_height="150dp"
     android:layout_gravity="center"
@@ -43,6 +43,23 @@
             android:layout_below="@+id/tupper_card_titleview"
             android:layout_toEndOf="@+id/tupper_card_imageview"
             android:layout_toRightOf="@+id/tupper_card_imageview"/>
+
+        <TextView
+            android:id="@+id/tupper_card_weightview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tupper_card_descriptionview"
+            android:layout_toEndOf="@+id/tupper_card_imageview"
+            android:layout_toRightOf="@+id/tupper_card_imageview"/>
+
+        <TextView
+            android:id="@+id/tupper_card_freezeview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tupper_card_weightview"
+            android:layout_toEndOf="@+id/tupper_card_imageview"
+            android:layout_toRightOf="@+id/tupper_card_imageview"/>
+
 
     </RelativeLayout>
 

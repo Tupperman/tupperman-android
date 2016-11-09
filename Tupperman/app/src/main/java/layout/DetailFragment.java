@@ -28,7 +28,7 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     private boolean isCreate;
     private View mView;
     private OnFragmentInteractionListener mListener;
-    SimpleDateFormat mDateFormat;
+    private SimpleDateFormat mDateFormat;
     public DetailFragment() {
     }
 

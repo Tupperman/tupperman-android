@@ -16,6 +16,7 @@ import ch.tupperman.tupperman.models.Tupper;
 import layout.DetailFragment;
 import layout.TupperFragment.OnListFragmentInteractionListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,17 +25,14 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     private List<Tupper> mValues = new ArrayList<>();
     private List<Tupper> mOriginalValues = new ArrayList<>();
     private final OnListFragmentInteractionListener mListener;
+    private SimpleDateFormat mDateFormat;
     private Context mContext;
 
     public MyTupperRecyclerViewAdapter(List<Tupper> items, OnListFragmentInteractionListener listener) {
+        mDateFormat = new SimpleDateFormat("dd.MM.yyyy");
         mValues = items;
         mOriginalValues = items;
         mListener = listener;
-    }
-
-    public void update(List<Tupper> tuppers) {
-        mValues.clear();
-        mValues.addAll(tuppers);
     }
 
     @Override
@@ -51,6 +49,9 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         holder.mItem = mValues.get(position);
         holder.mTitleView.setText(mValues.get(position).name);
         holder.mDescriptionView.setText(mValues.get(position).description);
+        holder.mWeightView.setText(Integer.toString(mValues.get(position).weight) + " g");
+        String date = mDateFormat.format(mValues.get(position).dateOfFreeze) + " - " + mDateFormat.format(mValues.get(position).expiryDate);
+        holder.mFreezeView.setText(date);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +107,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         public final ImageView mImgView;
         public final TextView mTitleView;
         public final TextView mDescriptionView;
+        public final TextView mFreezeView;
+        public final TextView mWeightView;
         public Tupper mItem;
 
         public ViewHolder(View view) {
@@ -114,6 +117,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
             mImgView = (ImageView) view.findViewById(R.id.tupper_card_imageview);
             mTitleView = (TextView) view.findViewById(R.id.tupper_card_titleview);
             mDescriptionView = (TextView) view.findViewById(R.id.tupper_card_descriptionview);
+            mFreezeView = (TextView) view.findViewById(R.id.tupper_card_freezeview);
+            mWeightView = (TextView) view.findViewById(R.id.tupper_card_weightview);
         }
 
         @Override
