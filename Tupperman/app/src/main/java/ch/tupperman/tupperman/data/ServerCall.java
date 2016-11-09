@@ -137,12 +137,12 @@ public class ServerCall {
 
             @Override
             public void onResponse(JSONObject response) {
-                callback.onSuccess(response.optString("token"));
+                callback.loginSuccess(response.optString("token"));
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.onError("Authentication failed");
+                callback.loginError("Authentication failed");
             }
         });
         mRequestQueue.add(request);

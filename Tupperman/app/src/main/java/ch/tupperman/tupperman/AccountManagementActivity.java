@@ -1,71 +1,73 @@
 package ch.tupperman.tupperman;
 
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.callbacks.LoginCallback;
 import ch.tupperman.tupperman.models.User;
+import ch.tupperman.tupperman.Constants.RequestCode;
+import layout.LoginFragment;
 
-public class AccountManagementActivity extends AppCompatActivity implements LoginCallback, View.OnClickListener {
+public class AccountManagementActivity extends AppCompatActivity implements LoginCallback,
+        LoginFragment.InteractionListener {
 
-    private EditText mEmailField;
-    private EditText mPasswordField;
-    private Button mLoginButton;
     private ServerCall mServerCall;
+    private Fragment mActiveFragment;
+    private User mUser;
 
     @Override
-    public void onSuccess(String authToken) {
+    public void loginSuccess(String authToken) {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString(getString(R.string.preferences_key_auth_token), authToken);
-        editor.putString(getString(R.string.preferences_key_email), mEmailField.getText().toString());
-        editor.putString(getString(R.string.preferences_key_password), mPasswordField.getText().toString());
+        editor.putString(getString(R.string.preferences_key_email), mUser.getEmail());
+        editor.putString(getString(R.string.preferences_key_password), mUser.getPassword());
         editor.apply();
 
         finish();
     }
 
     @Override
-    public void onError(String message) {
-        enableUserInterface();
+    public void loginError(String message) {
+        ((LoginFragment) mActiveFragment).enableUserInterface();
         Toast.makeText(this, getString(R.string.toast_login_failed), Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onClick(View v) {
-        disableUserInterface();
-        User user = new User(mEmailField.getText().toString(), mPasswordField.getText().toString());
-        mServerCall.authenticate(this, user);
-    }
-
-    private void disableUserInterface() {
-        mEmailField.setEnabled(false);
-        mPasswordField.setEnabled(false);
-        mLoginButton.setEnabled(false);
-    }
-
-    private void enableUserInterface() {
-        mEmailField.setEnabled(true);
-        mPasswordField.setEnabled(true);
-        mLoginButton.setEnabled(true);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
+
         setContentView(R.layout.activity_account_management);
 
-        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
-        mEmailField = (EditText) findViewById(R.id.editText_login_email);
-        mPasswordField = (EditText) findViewById(R.id.editText_login_password);
-        mLoginButton = (Button) findViewById(R.id.button_login);
-        mLoginButton.setOnClickListener(this);
+        Intent intent = getIntent();
+        RequestCode request = (RequestCode) intent.getSerializableExtra(getString(R.string.extra_account_management_request_type));
+
+        switch (request) {
+            case LOGIN:
+                mActiveFragment = new LoginFragment();
+            default:
+                break;
+        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.activity_account_management, mActiveFragment);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onClickLogin(User user) {
+        mUser = user;
+        ((LoginFragment) mActiveFragment).disableUserInterface();
+        mServerCall.authenticate(this, mUser);
     }
 }
