@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<Tupper> mTupperList;
     private final String tupperFragmentName = "TUPPER_FRAGMENT";
     private String mAuthToken;
+    private ServerCall mServerCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dataSync = new DataSync();
         setUpTupperService();
 
+        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
         updateAuthenticationToken();
+
 
         mFragmentManager = getSupportFragmentManager();
         if(mAuthToken == null) {
@@ -88,13 +91,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //if (mTupperReceiver.getIsOnline()) {
+                if (mTupperReceiver.getIsOnline()) {
                 DetailFragment detailFragment = new DetailFragment();
                 FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.content_main, detailFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
-                //}
+                }
             }
         });
 
@@ -113,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateAuthenticationToken() {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
         mAuthToken = preferences.getString(getString(R.string.preferences_key_auth_token), null);
+        mServerCall.setToken(mAuthToken);
     }
 
     private void startLoginActivity() {
@@ -192,8 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setTuppers() {
         mTupperList = dataSync.getAllTuppers();
         loadFragment();
-        ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.getTuppers(new GetTuppersCallback() {
+        mServerCall.getTuppers(new GetTuppersCallback() {
             TupperFactory tupperFactory = new TupperFactory();
 
             @Override
@@ -206,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, mAuthToken);
+        });
     }
 
     private void setUpTupperService() {
@@ -245,8 +248,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void update(final Tupper tupper) {
-        ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.createOrUpdateTupper(new CreateOrUpdateTupperCallback() {
+        mServerCall.postTupper(new CreateOrUpdateTupperCallback() {
             @Override
             public void onSuccess() {
             }
@@ -255,13 +257,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper, mAuthToken);
+        }, tupper);
 
     }
 
     private void create(final Tupper tupper) {
-        ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.createOrUpdateTupper(new CreateOrUpdateTupperCallback() {
+        mServerCall.postTupper(new CreateOrUpdateTupperCallback() {
             @Override
             public void onSuccess() {
                 mTupperList.add(tupper);
@@ -271,12 +272,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper, mAuthToken);
+        }, tupper);
     }
 
     private void delete(final Tupper tupper) {
-        ServerCall serverCall = new ServerCall(MainActivity.this);
-        serverCall.deleteTupper(new DeleteTupperCallback() {
+        mServerCall.deleteTupper(new DeleteTupperCallback() {
             @Override
             public void onSuccess() {
                 tupper.delete();
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onError(String message) {
                 Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
             }
-        }, tupper, mAuthToken);
+        }, tupper);
     }
 
     @Override

@@ -13,7 +13,7 @@ import com.android.volley.toolbox.Volley;
 
 
 public class TupperService extends IntentService {
-    private String url = "http://192.168.1.8:9080"; //SET YOUR OWN IP AND RUN THE TUPPERMAN SERVER
+    private String url = "http://ark-5.citrin.ch:9080/api"; //SET YOUR OWN IP AND RUN THE TUPPERMAN SERVER
     private RequestQueue mRequestQueue;
 
     public TupperService() {

@@ -21,32 +21,46 @@ import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.data.callbacks.LoginCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
+import ch.tupperman.tupperman.models.User;
 
+/* Test account:
+ *
+ * email: tes3t@hsr.ch
+ * password: Test12345678!
+ */
 
 public class ServerCall {
     private static final String TAG = "ServerCall";
-    private String mUrl = "http://ark-5.citrin.ch:9080/api/"; //SET YOUR OWN IP AND RUN THE TUPPERMAN SERVER
+    private static final String ENDPOINT_TUPPERS = "tuppers/";
+    private static final String ENDPOINT_AUTHENTICATE = "users/authenticate/";
+    private static final String ENDPOINT_REGISTER = "users/create";
+
+    private String mUrl;
+    private String mAuthenticationToken;
     private TupperFactory mTupperFactory;
-    /*
-    {
-    "email": "tes3t@hsr.ch",
-    "password": "Test12345678!"
-    }
-    */
     private RequestQueue mRequestQueue;
 
-    public ServerCall(Context context) {
+    public ServerCall(Context context, String endpoint) {
         if (mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(context);
         }
 
-
+        mUrl = endpoint;
         mTupperFactory = new TupperFactory();
     }
 
-    public void getTuppers(final GetTuppersCallback callback, String token) {
-        String url = mUrl + "tuppers/";
-        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, token, new Response.Listener<JSONArray>() {
+    public void setToken(String authenticationToken) {
+        mAuthenticationToken = authenticationToken;
+    }
+
+    /**
+     * Retrieve all tuppers from the Server
+     *
+     * @param callback The callback to notify on request completion
+     */
+    public void getTuppers(final GetTuppersCallback callback) {
+        String url = mUrl + ENDPOINT_TUPPERS;
+        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, mAuthenticationToken, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 List<Tupper> tuppers = mTupperFactory.toTuppers(response);
@@ -63,10 +77,17 @@ public class ServerCall {
         mRequestQueue.add(jsObjRequest);
     }
 
-
-    public void createOrUpdateTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper, String token) {
-        String url = mUrl + "tuppers/";
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), token, new Response.Listener<JSONObject>() {
+    /**
+     * Send a tupper to the server.
+     *
+     * Sending a tupper can be used to create a new as well as to update an existing tupper.
+     *
+     * @param callback The callback to notify on request completion
+     * @param tupper The tupper to transmit to the server
+     */
+    public void postTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper) {
+        String url = mUrl + ENDPOINT_TUPPERS;
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -81,9 +102,15 @@ public class ServerCall {
         mRequestQueue.add(jsObjRequest);
     }
 
-    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper, String token){
-        String url = mUrl + "tuppers/" + tupper.uuid;
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), token, new Response.Listener<JSONObject>() {
+    /**
+     * Delete a tupper on the server
+     *
+     * @param callback The callback to notify on request completion
+     * @param tupper The tupper to delete on the server
+     */
+    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
+        String url = mUrl + ENDPOINT_TUPPERS + tupper.uuid;
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -98,9 +125,15 @@ public class ServerCall {
         mRequestQueue.add(jsObjRequest);
     }
 
-    public void authenticate(final LoginCallback callback, JSONObject accountData) {
-        final String urlLogin = mUrl + "users/authenticate";
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, urlLogin, accountData, new Response.Listener<JSONObject>() {
+    /**
+     * Authenticate a user with the server
+     *
+     * @param callback The callback to notify on request completion
+     * @param user The user to authenticate
+     */
+    public void authenticate(final LoginCallback callback, User user) {
+        final String urlLogin = mUrl + ENDPOINT_AUTHENTICATE;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, urlLogin, user.toJSON(), new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {

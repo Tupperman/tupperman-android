@@ -8,17 +8,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.callbacks.LoginCallback;
+import ch.tupperman.tupperman.models.User;
 
 public class AccountManagementActivity extends AppCompatActivity implements LoginCallback, View.OnClickListener {
 
-    private EditText mEmailFiled;
+    private EditText mEmailField;
     private EditText mPasswordField;
     private Button mLoginButton;
+    private ServerCall mServerCall;
 
     @Override
     public void onSuccess(String authToken) {
@@ -26,7 +25,7 @@ public class AccountManagementActivity extends AppCompatActivity implements Logi
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString(getString(R.string.preferences_key_auth_token), authToken);
-        editor.putString(getString(R.string.preferences_key_email), mEmailFiled.getText().toString());
+        editor.putString(getString(R.string.preferences_key_email), mEmailField.getText().toString());
         editor.putString(getString(R.string.preferences_key_password), mPasswordField.getText().toString());
         editor.apply();
 
@@ -41,25 +40,19 @@ public class AccountManagementActivity extends AppCompatActivity implements Logi
 
     @Override
     public void onClick(View v) {
-        JSONObject accountData = new JSONObject();
         disableUserInterface();
-        try {
-            accountData.put("email", mEmailFiled.getText().toString());
-            accountData.put("password", mPasswordField.getText().toString());
-            doLogin(accountData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        User user = new User(mEmailField.getText().toString(), mPasswordField.getText().toString());
+        mServerCall.authenticate(this, user);
     }
 
     private void disableUserInterface() {
-        mEmailFiled.setEnabled(false);
+        mEmailField.setEnabled(false);
         mPasswordField.setEnabled(false);
         mLoginButton.setEnabled(false);
     }
 
     private void enableUserInterface() {
-        mEmailFiled.setEnabled(true);
+        mEmailField.setEnabled(true);
         mPasswordField.setEnabled(true);
         mLoginButton.setEnabled(true);
     }
@@ -69,15 +62,10 @@ public class AccountManagementActivity extends AppCompatActivity implements Logi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_management);
 
-        mEmailFiled = (EditText) findViewById(R.id.editText_login_email);
+        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
+        mEmailField = (EditText) findViewById(R.id.editText_login_email);
         mPasswordField = (EditText) findViewById(R.id.editText_login_password);
         mLoginButton = (Button) findViewById(R.id.button_login);
-
         mLoginButton.setOnClickListener(this);
-    }
-
-    private void doLogin(JSONObject accountData) {
-        ServerCall call = new ServerCall(AccountManagementActivity.this);
-        call.authenticate(this, accountData);
     }
 }
