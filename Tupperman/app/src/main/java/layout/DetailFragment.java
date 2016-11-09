@@ -59,6 +59,8 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
         editTextDescription.setText(mTupper.description);
         editTextName.setText(mTupper.name);
         editTextWeight.setText(Integer.toString(mTupper.weight));
+        textViewFreeze.setText(mDateFormat.format(mTupper.dateOfFreeze));
+        textViewExpire.setText(mDateFormat.format(mTupper.expiryDate));
     }
 
     @Override
