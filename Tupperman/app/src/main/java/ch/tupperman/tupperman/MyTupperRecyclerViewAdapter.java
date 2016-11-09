@@ -49,7 +49,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         holder.mItem = mValues.get(position);
         holder.mTitleView.setText(mValues.get(position).name);
         holder.mDescriptionView.setText(mValues.get(position).description);
-        holder.mWeightView.setText(Integer.toString(mValues.get(position).weight) + " g");
+        holder.mWeightView.setText(Integer.toString(mValues.get(position).weight) + "g");
         String date = mDateFormat.format(mValues.get(position).dateOfFreeze) + " - " + mDateFormat.format(mValues.get(position).expiryDate);
         holder.mFreezeView.setText(date);
 

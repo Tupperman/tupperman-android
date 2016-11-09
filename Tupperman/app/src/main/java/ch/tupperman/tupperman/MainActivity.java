@@ -32,6 +32,7 @@ import java.util.List;
 import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
+import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
@@ -199,10 +200,8 @@ public class MainActivity extends AppCompatActivity
             tupperFragment = TupperFragment.newInstance(mTupperList);
             mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
         } else {
-            //tupperFragment.myTupperRecyclerViewAdapter.update(mTupperList);
             tupperFragment.myTupperRecyclerViewAdapter.notifyDataSetChanged();
             mFragmentManager.beginTransaction().show(tupperFragment).commit();
-            System.out.println("show!");
         }
     }
 
@@ -250,6 +249,20 @@ public class MainActivity extends AppCompatActivity
         }, tupper);
     }
 
+    private void delete(final Tupper tupper) {
+        ServerCall serverCall = new ServerCall(MainActivity.this);
+        serverCall.deleteTupper(new DeleteTupperCallback() {
+            @Override
+            public void onSuccess() {
+                tupper.delete();
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, tupper);
+    }
 
     @Override
     public void onCreate(Tupper tupper) {
@@ -259,6 +272,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onUpdate(Tupper tupper) {
         update(tupper);
+    }
+
+    @Override
+    public void onDelete(Tupper tupper) {
+        delete(tupper);
     }
 
     @Override

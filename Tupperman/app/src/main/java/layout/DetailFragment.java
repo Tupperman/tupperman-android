@@ -25,6 +25,8 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     private EditText editTextDescription;
     private EditText editTextName;
     private EditText editTextWeight;
+    private TextView textViewFreeze;
+    private TextView textViewExpire;
     private boolean isCreate;
     private View mView;
     private OnFragmentInteractionListener mListener;
@@ -64,11 +66,14 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_detail, container, false);
         setSaveButton();
+        setDeleteButton();
         setFreezeButton();
         setExpireButton();
         editTextDescription = (EditText) mView.findViewById(R.id.editText_description);
         editTextName = (EditText) mView.findViewById(R.id.editText_name);
         editTextWeight = (EditText) mView.findViewById(R.id.editText_weight);
+        textViewFreeze = (TextView) mView.findViewById(R.id.textView_freeze);
+        textViewExpire = (TextView) mView.findViewById(R.id.textView_expire);
         if (mTupper != null) {
             initializeText();
         }
@@ -108,6 +113,17 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
                 } else {
                     mListener.onUpdate(mTupper);
                 }
+                getActivity().onBackPressed();
+            }
+        });
+    }
+
+    private void setDeleteButton() {
+        Button deleteButton = (Button) mView.findViewById(R.id.button_delete_detail);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onDelete(mTupper);
                 getActivity().onBackPressed();
             }
         });
@@ -158,5 +174,6 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     public interface OnFragmentInteractionListener {
         void onCreate(Tupper tupper);
         void onUpdate(Tupper tupper);
+        void onDelete(Tupper tupper);
     }
 }
