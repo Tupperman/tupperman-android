@@ -81,14 +81,29 @@ public class AccountManagementActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void registerSuccess(String token) {
+    public void registerSuccess() {
         mServerCall.authenticate(this, mUser);
     }
 
     @Override
-    public void registerError(String message) {
-        ((RegisterFragment) mActiveFragment).enableUserInterface();
-        Toast.makeText(this, getString(R.string.toast_registration_failed), Toast.LENGTH_LONG).show();
+    public void registerError(Error error) {
+        if (mActiveFragment instanceof RegisterFragment) {
+            ((RegisterFragment) mActiveFragment).enableUserInterface();
+            switch (error) {
+                case INVALID_EMAIL_ADDRESS:
+                    Toast.makeText(this, getString(R.string.toast_invalid_email_address), Toast.LENGTH_LONG).show();
+                    break;
+                case INVALID_PASSWORD:
+                    Toast.makeText(this, getString(R.string.toast_invalid_password), Toast.LENGTH_LONG).show();
+                    break;
+                case EMAIL_TAKEN:
+                    Toast.makeText(this, getString(R.string.toast_email_taken), Toast.LENGTH_LONG).show();
+                    break;
+                case UNKNOWN:
+                    Toast.makeText(this, getString(R.string.toast_unknown_error), Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
     }
 
     private void storeUserInformation(String token) {

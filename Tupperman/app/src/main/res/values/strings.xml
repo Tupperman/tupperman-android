@@ -29,7 +29,10 @@
 
     <!-- Toasts -->
     <string name="toast_login_failed">Login failed</string>
-    <string name="toast_registration_failed">Registration failed</string>
+    <string name="toast_unknown_error">An unknown error occurred</string>
+    <string name="toast_email_taken">The email address is already taken</string>
+    <string name="toast_invalid_password">The password is invalid</string>
+    <string name="toast_invalid_email_address">The email address is invalid</string>
 
     <!-- Preferences -->
     <string name="preferences_file_id">ch.tupperman.tupperman.preferences</string>

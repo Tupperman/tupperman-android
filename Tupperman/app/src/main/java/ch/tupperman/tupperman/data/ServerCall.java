@@ -11,6 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -161,13 +162,31 @@ public class ServerCall {
 
             @Override
             public void onResponse(JSONObject response) {
-                callback.registerSuccess(response.optString("token"));
+                boolean success = response.optBoolean("success", false);
+                if(success) {
+                    callback.registerSuccess();
+                } else {
+                    callback.registerError(RegisterCallback.Error.EMAIL_TAKEN);
+                }
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.registerError("Registration failed");
+                String jsonData = new String(error.networkResponse.data);
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonData);
+                    String message = jsonObject.optString("message");
+                    if(message == null) {
+                        callback.registerError(RegisterCallback.Error.UNKNOWN);
+                    } else if (message.endsWith("email address")) {
+                        callback.registerError(RegisterCallback.Error.INVALID_EMAIL_ADDRESS);
+                    } else {
+                        callback.registerError(RegisterCallback.Error.INVALID_PASSWORD);
+                    }
+                } catch (JSONException e) {
+                    callback.registerError(RegisterCallback.Error.UNKNOWN);
+                }
             }
         }));
     }
