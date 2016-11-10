@@ -5,7 +5,6 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,6 +21,7 @@ public class Tupper extends Model implements Serializable {
         dateOfFreeze = new Date();
         expiryDate = new Date();
     }
+
     @Column(name = "uuid")
     public String uuid;
 

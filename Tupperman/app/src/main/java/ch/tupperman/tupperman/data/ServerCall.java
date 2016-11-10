@@ -111,7 +111,7 @@ public class ServerCall {
      */
     public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
         String url = mUrl + ENDPOINT_TUPPERS + tupper.uuid;
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, tupper.toJSON(), mAuthenticationToken, new Response.Listener<JSONObject>() {
+        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, null, mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -120,7 +120,7 @@ public class ServerCall {
             @Override
             public void onErrorResponse(VolleyError error) {
                 callback.onError("Something went wrong during the create tupper request!");
-                Log.e(TAG, "createTupper: " + error.toString());
+                Log.e(TAG, "deletTupper: " + error.toString());
             }
         });
         mRequestQueue.add(jsObjRequest);
