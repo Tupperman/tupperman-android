@@ -139,12 +139,29 @@ public class ServerCall {
 
             @Override
             public void onResponse(JSONObject response) {
-                callback.loginSuccess(response.optString("token"));
+                boolean success = response.optBoolean("success", false);
+                if(success) {
+                    callback.loginSuccess(response.optString("token"));
+                } else {
+                    callback.loginError(LoginCallback.Error.UNKNOWN);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.loginError("Authentication failed");
+                String jsonData = new String(error.networkResponse.data);
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonData);
+                    String message = jsonObject.optString("message");
+
+                    if (message != null && message.endsWith("password wrong.")) {
+                        callback.loginError(LoginCallback.Error.INVALID_CREDENTIALS);
+                    } else {
+                        callback.loginError(LoginCallback.Error.UNKNOWN);
+                    }
+                } catch (JSONException e) {
+                    callback.loginError(LoginCallback.Error.UNKNOWN);
+                }
             }
         });
         mRequestQueue.add(request);
