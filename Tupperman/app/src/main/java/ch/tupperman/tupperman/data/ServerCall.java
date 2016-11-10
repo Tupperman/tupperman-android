@@ -25,12 +25,6 @@ import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.models.User;
 
-/* Test account:
- *
- * email: tes3t@hsr.ch
- * password: Test12345678!
- */
-
 public class ServerCall {
     private static final String TAG = "ServerCall";
     private static final String ENDPOINT_TUPPERS = "tuppers/";
@@ -43,10 +37,7 @@ public class ServerCall {
     private RequestQueue mRequestQueue;
 
     public ServerCall(Context context, String endpoint) {
-        if (mRequestQueue == null) {
-            mRequestQueue = Volley.newRequestQueue(context);
-        }
-
+        mRequestQueue = Volley.newRequestQueue(context);
         mUrl = endpoint;
         mTupperFactory = new TupperFactory();
     }
@@ -62,7 +53,7 @@ public class ServerCall {
      */
     public void getTuppers(final GetTuppersCallback callback) {
         String url = mUrl + ENDPOINT_TUPPERS;
-        JsonArrayRequestWithToken jsObjRequest = new JsonArrayRequestWithToken(Request.Method.GET, url, null, mAuthenticationToken, new Response.Listener<JSONArray>() {
+        mRequestQueue.add(new JsonArrayRequestWithToken(Request.Method.GET, url, null, mAuthenticationToken, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 List<Tupper> tuppers = mTupperFactory.toTuppers(response);
@@ -72,11 +63,16 @@ public class ServerCall {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.onError("Something went wrong during the get tuppers request!");
-                Log.e(TAG, error.toString());
+                String jsonData = new String(error.networkResponse.data);
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonData);
+                    String message = jsonObject.optString("message");
+                    callback.onError(message);
+                } catch (JSONException e) {
+                    callback.onError(jsonData);
+                }
             }
-        });
-        mRequestQueue.add(jsObjRequest);
+        }));
     }
 
     /**
@@ -89,7 +85,7 @@ public class ServerCall {
      */
     public void postTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper) {
         String url = mUrl + ENDPOINT_TUPPERS;
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), mAuthenticationToken, new Response.Listener<JSONObject>() {
+        mRequestQueue.add(new JsonObjectRequestWithToken(Request.Method.POST, url, tupper.toJSON(), mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -100,8 +96,7 @@ public class ServerCall {
                 callback.onError("Something went wrong during the create tupper request!");
                 Log.e(TAG, "createTupper: " + error.toString());
             }
-        });
-        mRequestQueue.add(jsObjRequest);
+        }));
     }
 
     /**
@@ -112,7 +107,7 @@ public class ServerCall {
      */
     public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
         String url = mUrl + ENDPOINT_TUPPERS + tupper.uuid;
-        JsonObjectRequestWithToken jsObjRequest = new JsonObjectRequestWithToken(Request.Method.DELETE, url, null, mAuthenticationToken, new Response.Listener<JSONObject>() {
+        mRequestQueue.add(new JsonObjectRequestWithToken(Request.Method.DELETE, url, null, mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 callback.onSuccess();
@@ -123,8 +118,7 @@ public class ServerCall {
                 callback.onError("Something went wrong during the create tupper request!");
                 Log.e(TAG, "deletTupper: " + error.toString());
             }
-        });
-        mRequestQueue.add(jsObjRequest);
+        }));
     }
 
     /**
@@ -135,7 +129,7 @@ public class ServerCall {
      */
     public void authenticate(final LoginCallback callback, User user) {
         final String urlLogin = mUrl + ENDPOINT_AUTHENTICATE;
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, urlLogin, user.toJSON(), new Response.Listener<JSONObject>() {
+        mRequestQueue.add(new JsonObjectRequest(Request.Method.POST, urlLogin, user.toJSON(), new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
@@ -163,8 +157,7 @@ public class ServerCall {
                     callback.loginError(LoginCallback.Error.UNKNOWN);
                 }
             }
-        });
-        mRequestQueue.add(request);
+        }));
     }
 
     /**
@@ -207,4 +200,5 @@ public class ServerCall {
             }
         }));
     }
+
 }
