@@ -40,11 +40,11 @@ public class AccountManagementActivity extends AppCompatActivity implements
         switch (request) {
             case LOGIN:
                 mActiveFragment = new LoginFragment();
-                setTitle("Sign In");
+                setTitle(getString(R.string.title_activity_login));
                 break;
             case REGISTER:
                 mActiveFragment = new RegisterFragment();
-                setTitle("Register");
+                setTitle(getString(R.string.title_activity_register));
                 break;
         }
 
@@ -68,9 +68,18 @@ public class AccountManagementActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void loginError(String message) {
-        ((LoginFragment) mActiveFragment).enableUserInterface();
-        Toast.makeText(this, getString(R.string.toast_login_failed), Toast.LENGTH_LONG).show();
+    public void loginError(LoginCallback.Error error) {
+        if (mActiveFragment instanceof  LoginFragment) {
+            ((LoginFragment) mActiveFragment).enableUserInterface();
+            switch (error) {
+                case INVALID_CREDENTIALS:
+                    Toast.makeText(this, getString(R.string.toast_login_failed), Toast.LENGTH_LONG).show();
+                    break;
+                case UNKNOWN:
+                    Toast.makeText(this, getString(R.string.toast_unknown_error), Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
     }
 
     @Override
@@ -81,14 +90,29 @@ public class AccountManagementActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void registerSuccess(String token) {
+    public void registerSuccess() {
         mServerCall.authenticate(this, mUser);
     }
 
     @Override
-    public void registerError(String message) {
-        ((RegisterFragment) mActiveFragment).enableUserInterface();
-        Toast.makeText(this, getString(R.string.toast_registration_failed), Toast.LENGTH_LONG).show();
+    public void registerError(RegisterCallback.Error error) {
+        if (mActiveFragment instanceof RegisterFragment) {
+            ((RegisterFragment) mActiveFragment).enableUserInterface();
+            switch (error) {
+                case INVALID_EMAIL_ADDRESS:
+                    Toast.makeText(this, getString(R.string.toast_invalid_email_address), Toast.LENGTH_LONG).show();
+                    break;
+                case INVALID_PASSWORD:
+                    Toast.makeText(this, getString(R.string.toast_invalid_password), Toast.LENGTH_LONG).show();
+                    break;
+                case EMAIL_TAKEN:
+                    Toast.makeText(this, getString(R.string.toast_email_taken), Toast.LENGTH_LONG).show();
+                    break;
+                case UNKNOWN:
+                    Toast.makeText(this, getString(R.string.toast_unknown_error), Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
     }
 
     private void storeUserInformation(String token) {
