@@ -41,6 +41,7 @@ public class TupperStoreTest {
 
     @Test
     public void deleteTupper() throws Exception {
+        deleteAllTuppers();
         Tupper tupper = saveTupper();
         List<Tupper> tuppers = getAllTuppers();
 
@@ -67,6 +68,13 @@ public class TupperStoreTest {
         tupper.name = mTupperName;
         tupper.save();
         return tupper;
+    }
+
+    private void deleteAllTuppers() {
+        List<Tupper> tuppers = getAllTuppers();
+        for (int j = tuppers.size() - 1; j >= 0; j--) {
+            tuppers.get(j).delete();
+        }
     }
 
     private List<Tupper> getAllTuppers() {
