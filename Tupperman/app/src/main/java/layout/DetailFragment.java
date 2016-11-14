@@ -109,11 +109,12 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     }
 
     public void saveTupper() {
+        mTupper.uuid = editTextUUID.getText().toString();
         mTupper.name = editTextName.getText().toString();
         mTupper.description = editTextDescription.getText().toString();
-        mTupper.weight = Integer.parseInt(editTextWeight.getText().toString());
+        mTupper.weight = editTextWeight.getText().toString().equals("")? 0 : Integer.parseInt(editTextWeight.getText().toString());
         mTupper.foodGroup = editTextFoodGroups.getText().toString();
-//        mTupper.save();
+
         if (isCreate) {
             mListener.onCreate(mTupper);
         } else {

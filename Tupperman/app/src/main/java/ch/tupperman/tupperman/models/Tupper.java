@@ -53,8 +53,8 @@ public class Tupper extends Model implements Serializable {
             jsonTupper.put("uuid", uuid);
             jsonTupper.put("name", name);
             jsonTupper.put("description", description);
-            jsonTupper.put("weight", 42);
-            jsonTupper.put("foodGroups", "Vegan :-P");
+            jsonTupper.put("weight", weight);
+            jsonTupper.put("foodGroups", foodGroup);
             jsonTupper.put("freezeDate", dateOfFreeze.toString());
             jsonTupper.put("expiryDate", expiryDate.toString());
             return jsonTupper;

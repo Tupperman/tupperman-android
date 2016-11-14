@@ -75,12 +75,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
 
         mFragmentManager = getSupportFragmentManager();
-        loadListFragment();
 
         if (mAuthToken == null) {
-            //TODO do this in single activity
+            //TODO do this in single activity?
             setNoUserFragment();
         } else {
+            loadListFragment();
             initialize();
         }
     }
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        loadListFragment();
         setTuppers();
     }
 
@@ -161,9 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_scanner) {
-            //TODO shorten if no options have to be set
-            IntentIntegrator intentIntegrator = new IntentIntegrator(this);
-            intentIntegrator.initiateScan();
+            new IntentIntegrator(this).initiateScan();
         } else if (id == R.id.nav_tupperlist) {
             loadListFragment();
         } else if (id == R.id.nav_settings) {
@@ -206,11 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void setTuppers() {
-//        if (getTupperFragment() == null) {
-//            loadListFragment();
-//        } else {
         getTupperFragment().setTuppers(DataSync.getAllTuppers());
-//        }
 
         mServerCall.getTuppers(new GetTuppersCallback() {
 

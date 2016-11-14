@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import ch.tupperman.tupperman.R;
 import ch.tupperman.tupperman.models.User;
@@ -18,6 +19,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     private TextInputEditText mEmailField;
     private TextInputEditText mPasswordField;
+    private TextInputEditText mConfirmPasswordField;
     private Button mRegisterButton;
     private InteractionListener mListener;
 
@@ -25,6 +27,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_register, container, false);
         mEmailField = (TextInputEditText) view.findViewById(R.id.editText_register_email);
+        mConfirmPasswordField = (TextInputEditText) view.findViewById(R.id.editText_register_repeatPassword);
         mPasswordField = (TextInputEditText) view.findViewById(R.id.editText_register_password);
         mRegisterButton = (Button) view.findViewById(R.id.button_register);
         mRegisterButton.setOnClickListener(this);
@@ -43,8 +46,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(mListener != null) {
-            User user = new User(mEmailField.getText().toString(), mPasswordField.getText().toString());
-            mListener.onClickRegister(user);
+            if (mPasswordField.getText().toString().equals(mConfirmPasswordField.getText().toString())) {
+                User user = new User(mEmailField.getText().toString(), mPasswordField.getText().toString());
+                mListener.onClickRegister(user);
+            } else {
+                Toast.makeText(this.getContext(),"Passwords do not match.", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

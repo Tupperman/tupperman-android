@@ -36,6 +36,7 @@ public class EditTupperActivity extends AppCompatActivity implements DetailFragm
 
         mFragmentManager = getSupportFragmentManager();
 
+        //TODO make config option
         mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
         updateAuthenticationToken();
 
@@ -50,7 +51,11 @@ public class EditTupperActivity extends AppCompatActivity implements DetailFragm
         ActiveAndroid.initialize(config.create());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (tupper == null) {
+            setTitle("Create Tupper");
+        }
         getDetailFragment().setTupper(tupper);
+
     }
 
     private void updateAuthenticationToken() {
@@ -65,7 +70,7 @@ public class EditTupperActivity extends AppCompatActivity implements DetailFragm
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_details, menu);
         return true;
