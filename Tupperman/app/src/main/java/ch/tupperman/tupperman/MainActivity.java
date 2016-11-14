@@ -27,12 +27,12 @@ import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
+import com.activeandroid.query.Select;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
-import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.models.Tupper;
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void setTuppers() {
-        getTupperFragment().setTuppers(DataSync.getAllTuppers());
+        getTupperFragment().setTuppers(this.getAllTuppers());
 
         mServerCall.getTuppers(new GetTuppersCallback() {
 
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             TupperListFragment tupperListFragment = getTupperFragment();
             if (tupperListFragment == null) {
-                tupperListFragment = TupperListFragment.newInstance(DataSync.getAllTuppers());
+                tupperListFragment = TupperListFragment.newInstance(this.getAllTuppers());
             }
             mFragmentManager.beginTransaction().replace(R.id.content_main, tupperListFragment, tupperFragmentName).commit();
             mFragmentManager.executePendingTransactions();
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 String uuid = result.getContents();
-                List<Tupper> allTuppers = DataSync.getAllTuppers();
+                List<Tupper> allTuppers = this.getAllTuppers();
                 Tupper match = null;
                 for (Tupper t : allTuppers) {
                     if (t.uuid.equals(uuid)) {
@@ -305,6 +305,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onClickRegister() {
         startRegistrationActivity();
+    }
+
+    public static List<Tupper> getAllTuppers() {
+        return new Select()
+                .from(Tupper.class)
+                .execute();
     }
 }
 
