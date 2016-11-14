@@ -23,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Filter;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FragmentManager mFragmentManager;
     private String mAuthToken;
     private ServerCall mServerCall;
+    private Filter filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,18 +213,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(query);
-        return false; //was false
+        if (filter == null) {
+            filter = getTupperFragment().myTupperRecyclerViewAdapter.getFilter();
+        }
+        filter.filter(query);
+        return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (newText.length() == 0) {
-            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
-        } else {
-        getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(newText);
+        if (filter == null) {
+            filter = getTupperFragment().myTupperRecyclerViewAdapter.getFilter();
         }
-        return false; //was false
+        if (newText.length() == 0) {
+            filter.filter("");
+        } else {
+            filter.filter(newText);
+        }
+        return false;
     }
 
 

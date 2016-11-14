@@ -61,7 +61,7 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     }
 
     public void setTuppers(List<Tupper> list) {
-        mValues = list;
+        mValues = mOriginalValues = list;
     }
 
     @Override
@@ -73,6 +73,8 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
     @Override
     public Filter getFilter() {
         return new Filter() {
+            int lastLength = 0;
+
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
@@ -86,13 +88,20 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
 
                 if (constraint.length() == 0) {
                     filteredResults = mOriginalValues;
+                } else if (constraint.length() <= lastLength) {
+                    for (Tupper tupper : mOriginalValues) {
+                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            filteredResults.add(tupper);
+                        }
+                    }
                 } else {
                     for (Tupper tupper : mValues) {
-                        if (tupper.name.toLowerCase().contains(constraint)) {
+                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase())) {
                             filteredResults.add(tupper);
                         }
                     }
                 }
+                lastLength = constraint.length();
                 FilterResults results = new FilterResults();
                 results.values = filteredResults;
                 return results;
