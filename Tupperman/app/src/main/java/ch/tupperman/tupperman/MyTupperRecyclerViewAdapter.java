@@ -1,8 +1,6 @@
 package ch.tupperman.tupperman;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.tupperman.tupperman.models.Tupper;
-import layout.DetailFragment;
-import layout.TupperFragment.OnListFragmentInteractionListener;
+import layout.TupperListFragment.OnListFragmentInteractionListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

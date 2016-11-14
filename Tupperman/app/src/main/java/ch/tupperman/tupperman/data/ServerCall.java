@@ -94,7 +94,7 @@ public class ServerCall {
             @Override
             public void onErrorResponse(VolleyError error) {
                 callback.onError("Something went wrong during the create tupper request!");
-                Log.e(TAG, "createTupper: " + error.toString());
+                Log.e(TAG, "createTupper: " + error.toString() + "\n" + error.getMessage());
             }
         }));
     }
@@ -115,8 +115,8 @@ public class ServerCall {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                callback.onError("Something went wrong during the create tupper request!");
-                Log.e(TAG, "deletTupper: " + error.toString());
+	    callback.onError("Something went wrong during the delete tupper request!");
+	    Log.e(TAG, "deleteTupper: " + error.toString() + "\n" + error.getMessage());
             }
         }));
     }

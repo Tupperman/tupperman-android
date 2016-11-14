@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_main"
-    android:tag="@string/tupperFragment_Tag"
-    android:name="layout.TupperListFragment"
+    android:id="@+id/fragment_edit_tupper"
+    android:name="layout.DetailFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:windowSoftInputMode="adjustResize"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:layout="@layout/fragment_tupper_list" />
+    tools:layout="@layout/fragment_details" />

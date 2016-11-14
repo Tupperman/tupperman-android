@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/list"
-    android:name="ch.tupperman.tupperman.TupperFragment"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="0dp"
-    android:layout_marginBottom="0dp"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:listitem="@layout/fragment_tupper"/>
+    android:name="ch.tupperman.tupperman.TupperFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/tupper_list"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="0dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/fragment_tupper" />
+
+</FrameLayout>

@@ -10,26 +10,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.tupperman.tupperman.MyTupperRecyclerViewAdapter;
 import ch.tupperman.tupperman.R;
 import ch.tupperman.tupperman.models.Tupper;
 
-public class TupperFragment extends Fragment {
+public class TupperListFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private List<Tupper> tuppers;
+    private List<Tupper> mTupperList = new ArrayList<>();
     private OnListFragmentInteractionListener mListener;
     public MyTupperRecyclerViewAdapter myTupperRecyclerViewAdapter;
 
-    public TupperFragment() {
+    public TupperListFragment() {
     }
 
-    public static TupperFragment newInstance(List<Tupper> tuppers) {
-        TupperFragment fragment = new TupperFragment();
-        fragment.tuppers = tuppers;
+    public static TupperListFragment newInstance(List<Tupper> tuppers) {
+        TupperListFragment fragment = new TupperListFragment();
+        fragment.mTupperList = tuppers;
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
@@ -44,25 +45,24 @@ public class TupperFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
         setRetainInstance(true);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tupper_list, container, false);
+        View recyclerView = view.findViewById(R.id.tupper_list);
 
-        if (view instanceof RecyclerView) {
+        if (recyclerView instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            RecyclerView crecyclerView = (RecyclerView) recyclerView;
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                crecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                crecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(tuppers, mListener);
-            recyclerView.setAdapter(myTupperRecyclerViewAdapter);
-
+            myTupperRecyclerViewAdapter = new MyTupperRecyclerViewAdapter(mTupperList, mListener);
+            crecyclerView.setAdapter(myTupperRecyclerViewAdapter);
         }
         return view;
     }
@@ -83,10 +83,28 @@ public class TupperFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        System.out.println("TupperFragment detach!");
+        System.out.println("TupperListFragment detach!");
     }
 
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(Tupper tupper);
     }
+
+    public void setTuppers(List<Tupper> list){
+        mTupperList = list;
+        if (myTupperRecyclerViewAdapter!=null) {
+            myTupperRecyclerViewAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void addTupper(Tupper tupper){
+        mTupperList.add(tupper);
+        //TODO maybe use notifyItemInserted
+        myTupperRecyclerViewAdapter.notifyDataSetChanged();
+    }
+
+    public boolean exists(Tupper tupper){
+        return mTupperList.contains(tupper);
+    }
+
 }

@@ -9,76 +9,76 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
-import android.view.Menu;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.util.List;
 
 import ch.tupperman.tupperman.data.DataSync;
 import ch.tupperman.tupperman.data.ServerCall;
-import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
-import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
 import ch.tupperman.tupperman.models.Tupper;
-import ch.tupperman.tupperman.models.TupperFactory;
 import ch.tupperman.tupperman.service.TupperReceiver;
 import ch.tupperman.tupperman.service.TupperService;
-import layout.DetailFragment;
 import layout.NoUserFragment;
 import layout.SettingsFragment;
-import layout.TupperFragment;
+import layout.TupperListFragment;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        TupperFragment.OnListFragmentInteractionListener,
+        TupperListFragment.OnListFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
-        DetailFragment.OnFragmentInteractionListener,
         SearchView.OnQueryTextListener,
         NoUserFragment.InteractionListener {
 
     private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
-    private DataSync dataSync;
     private FragmentManager mFragmentManager;
-    private List<Tupper> mTupperList;
-    private final String tupperFragmentName = "TUPPER_FRAGMENT";
+    private String tupperFragmentName;
     private String mAuthToken;
     private ServerCall mServerCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        tupperFragmentName = getString(R.string.tupperFragment_Tag);
 
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
         ActiveAndroid.initialize(config.create());
 
-        dataSync = new DataSync();
         setUpTupperService();
 
+        //TODO make config option
         mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
         updateAuthenticationToken();
 
+        setContentView(R.layout.activity_main);
 
         mFragmentManager = getSupportFragmentManager();
-        if(mAuthToken == null) {
+        loadListFragment();
+
+        if (mAuthToken == null) {
+            //TODO do this in single activity
             setNoUserFragment();
         } else {
             initialize();
@@ -102,24 +102,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 if (mTupperReceiver.getIsOnline()) {
-                DetailFragment detailFragment = new DetailFragment();
-                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.content_main, detailFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                    startEditActivity(null);
                 }
             }
         });
+        fab.show();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         setTuppers();
     }
 
@@ -143,10 +139,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivityForResult(loginIntent, requestType.getValue());
     }
 
+    private void startEditActivity(Tupper tupper) {
+        Intent loginIntent = new Intent(this, EditTupperActivity.class);
+        loginIntent.putExtra(getString(R.string.extra_tupper_uuid), tupper);
+        startActivityForResult(loginIntent, 1);
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        if (drawer != null && drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -159,14 +161,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_scanner) {
+            //TODO shorten if no options have to be set
+            IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+            intentIntegrator.initiateScan();
         } else if (id == R.id.nav_tupperlist) {
-            TupperFragment fragment = TupperFragment.newInstance(mTupperList);
-            mFragmentManager.beginTransaction().replace(R.id.content_main, fragment, tupperFragmentName).commit();
+            loadListFragment();
         } else if (id == R.id.nav_settings) {
+            //TODO change to loadSettingsFragment
             SettingsFragment fragment = SettingsFragment.newInstance();
             mFragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -183,16 +187,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onListFragmentInteraction(Tupper item) {
-        //if (mTupperReceiver.getIsOnline()) {
-        DetailFragment detailFragment = new DetailFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("tupper", item);
-        detailFragment.setArguments(bundle);
-        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_main, detailFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-        //}
+        startEditActivity(item);
     }
 
     @Override
@@ -211,15 +206,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private void setTuppers() {
-        mTupperList = dataSync.getAllTuppers();
-        loadFragment();
+//        if (getTupperFragment() == null) {
+//            loadListFragment();
+//        } else {
+        getTupperFragment().setTuppers(DataSync.getAllTuppers());
+//        }
+
         mServerCall.getTuppers(new GetTuppersCallback() {
-            TupperFactory tupperFactory = new TupperFactory();
 
             @Override
             public void onSuccess(List<Tupper> tuppers) {
-                mTupperList = tuppers;
-                loadFragment();
+                getTupperFragment().setTuppers(tuppers);
             }
 
             @Override
@@ -239,98 +236,62 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
     }
 
-    private void loadFragment() {
-        TupperFragment tupperFragment = getTupperFragment();
-        if (tupperFragment == null) {
-            tupperFragment = TupperFragment.newInstance(mTupperList);
-            mFragmentManager.beginTransaction().replace(R.id.content_main, tupperFragment, tupperFragmentName).commit();
+    private void loadListFragment() {
+        if (mAuthToken == null) {
+            setNoUserFragment();
         } else {
-            tupperFragment.myTupperRecyclerViewAdapter.notifyDataSetChanged();
-            mFragmentManager.beginTransaction().show(tupperFragment).commit();
+            TupperListFragment tupperListFragment = getTupperFragment();
+            if (tupperListFragment == null) {
+                tupperListFragment = TupperListFragment.newInstance(DataSync.getAllTuppers());
+            }
+            mFragmentManager.beginTransaction().replace(R.id.content_main, tupperListFragment, tupperFragmentName).commit();
+            mFragmentManager.executePendingTransactions();
         }
+
     }
 
-
-    private TupperFragment getTupperFragment() {
-        return (TupperFragment) mFragmentManager.findFragmentByTag("TUPPER_FRAGMENT");
+    private TupperListFragment getTupperFragment() {
+        return (TupperListFragment) mFragmentManager.findFragmentByTag(tupperFragmentName);
     }
 
-    public void updateTupperList(Tupper tupper) {
-        int tupperIndex = mTupperList.indexOf(tupper);
-        if (tupperIndex == -1) {
-            mTupperList.add(tupper);
+//    public void updateTupperList(Tupper tupper) {
+//        if (!getTupperFragment().exists(tupper)) {
+//            addTupper(tupper);
+//        }
+//        create(tupper);
+//    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                String uuid = result.getContents();
+                List<Tupper> allTuppers = DataSync.getAllTuppers();
+                Tupper match = null;
+                for (Tupper t : allTuppers) {
+                    if (t.uuid.equals(uuid)) {
+                        match = t;
+                    }
+                }
+                if (match != null) {
+                    startEditActivity(match);
+                } else {
+                    Toast.makeText(this, "No Tupper found for this code.", Toast.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+            updateAuthenticationToken();
+            initialize();
         }
-        create(tupper);
-        loadFragment();
-    }
-
-    private void update(final Tupper tupper) {
-        mServerCall.postTupper(new CreateOrUpdateTupperCallback() {
-            @Override
-            public void onSuccess() {
-            }
-
-            @Override
-            public void onError(String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        }, tupper);
-
-    }
-
-    private void create(final Tupper tupper) {
-        mServerCall.postTupper(new CreateOrUpdateTupperCallback() {
-            @Override
-            public void onSuccess() {
-                mTupperList.add(tupper);
-            }
-
-            @Override
-            public void onError(String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        }, tupper);
-    }
-
-    private void delete(final Tupper tupper) {
-        mServerCall.deleteTupper(new DeleteTupperCallback() {
-            @Override
-            public void onSuccess() {
-                tupper.delete();
-            }
-
-            @Override
-            public void onError(String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        }, tupper);
-    }
-
-    @Override
-    public void onCreate(Tupper tupper) {
-        create(tupper);
-    }
-
-    @Override
-    public void onUpdate(Tupper tupper) {
-        update(tupper);
-    }
-
-    @Override
-    public void onDelete(Tupper tupper) {
-        delete(tupper);
     }
 
     @Override
     public void onFragmentInteraction(Tupper tupper) {
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        updateAuthenticationToken();
-        initialize();
     }
 
     @Override

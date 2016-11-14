@@ -6,8 +6,7 @@
 
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="nav_scan">Scan</string>
     <string name="nav_overview">Overview</string>
     <string name="nav_settings">Settings</string>
@@ -42,8 +41,19 @@
     <string name="do_register">Register</string>
     <string name="no_user">No logged-in user</string>
     <string name="button_login_user">Login to existing account</string>
-    <string name="or">Or</string>
+    <string name="or">or</string>
     <string name="button_register_user">Register new account</string>
     <string name="title_activity_register">Register</string>
+    <string name="details_name">Name</string>
+    <string name="details_weight">Weight in g</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_details">DetailsActivity</string>
+    <string name="extra_tupper_uuid">requestUUID</string>
+    <string name="tupperFragment_Tag">TUPPER_FRAGMENT</string>
+    <string name="detailFragment_Tag">FRAGMENT_DETAIL</string>
+    <string name="nav_logout">Logout</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="details_foodGroups">Food groups</string>
 
 </resources>

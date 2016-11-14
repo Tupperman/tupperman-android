@@ -1,4 +1,6 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,26 +12,46 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".AccountManagementActivity">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="start"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        app:srcCompat="@mipmap/ic_launcher"
+        android:layout_weight="0.00" />
 
-    <EditText
-        android:id="@+id/editText_register_email"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:ems="10"
-        android:hint="@string/placeholder_username"
-        android:inputType="textEmailAddress"
-        android:maxLines="1" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/editText_register_password"
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/editText_register_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:ems="10"
+            android:hint="@string/placeholder_username"
+            android:inputType="textEmailAddress"
+            android:maxLines="1" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:ems="10"
-        android:hint="@string/placeholder_password"
-        android:inputType="textPassword"
-        android:maxLines="1" />
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/editText_register_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:ems="10"
+            android:hint="@string/placeholder_password"
+            android:inputType="textPassword"
+            android:maxLines="1" />
+
+    </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/button_register"

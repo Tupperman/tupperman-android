@@ -6,15 +6,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
 import java.util.Date;
 
 import ch.tupperman.tupperman.R;
-
-import static android.content.ContentValues.TAG;
 
 public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {

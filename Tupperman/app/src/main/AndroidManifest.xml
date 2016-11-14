@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="ch.tupperman.tupperman">
+    package="ch.tupperman.tupperman">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PROFILE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -20,20 +20,20 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".service.TupperService"/>
+        <service android:name=".service.TupperService" />
 
         <meta-data
             android:name="AA_DB_NAME"
-            android:value="Tupperman.db"/>
+            android:value="Tupperman.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="5"/>
+            android:value="5" />
 
         <activity
             android:name=".AccountManagementActivity"
@@ -41,7 +41,16 @@
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.tupperman.tupperman.MainActivity"/>
+                android:value="ch.tupperman.tupperman.MainActivity" />
+        </activity>
+        <activity
+            android:name=".EditTupperActivity"
+            android:label="@string/title_activity_details"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.tupperman.tupperman.MainActivity" />
         </activity>
     </application>
 
