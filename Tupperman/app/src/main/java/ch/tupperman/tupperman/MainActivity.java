@@ -39,13 +39,11 @@ import ch.tupperman.tupperman.models.Tupper;
 import ch.tupperman.tupperman.service.TupperReceiver;
 import ch.tupperman.tupperman.service.TupperService;
 import layout.NoUserFragment;
-import layout.SettingsFragment;
 import layout.TupperListFragment;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         TupperListFragment.OnListFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener,
         SearchView.OnQueryTextListener,
         NoUserFragment.InteractionListener {
 
@@ -162,13 +160,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_scanner) {
-            new IntentIntegrator(this).initiateScan();
+            if (mAuthToken !=null) {
+                new IntentIntegrator(this).initiateScan();
+            } else {
+              setNoUserFragment();
+            }
         } else if (id == R.id.nav_tupperlist) {
             loadListFragment();
-        } else if (id == R.id.nav_settings) {
-            //TODO change to loadSettingsFragment
-            SettingsFragment fragment = SettingsFragment.newInstance();
-            mFragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
+        } else if (id == R.id.nav_logout) {
+            mAuthToken=null;
+            SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+
+            editor.putString(getString(R.string.preferences_key_auth_token), null);
+            editor.putString(getString(R.string.preferences_key_email), null);
+            editor.putString(getString(R.string.preferences_key_password), null);
+            editor.apply();
+            setNoUserFragment();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -284,10 +292,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public void onFragmentInteraction(Tupper tupper) {
-
-    }
+//    @Override
+//    public void onFragmentInteraction(Tupper tupper) {
+//
+//    }
 
     @Override
     public void onClickLogin() {
