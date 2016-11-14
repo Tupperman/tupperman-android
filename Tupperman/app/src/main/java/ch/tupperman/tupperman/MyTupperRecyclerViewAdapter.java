@@ -60,6 +60,9 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         });
     }
 
+    public void setTuppers(List<Tupper> list) {
+        mValues = list;
+    }
 
     @Override
     public int getItemCount() {
@@ -84,13 +87,11 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
                 if (constraint.length() == 0) {
                     filteredResults = mOriginalValues;
                 } else {
-
                     for (Tupper tupper : mValues) {
                         if (tupper.name.toLowerCase().contains(constraint)) {
                             filteredResults.add(tupper);
                         }
                     }
-
                 }
                 FilterResults results = new FilterResults();
                 results.values = filteredResults;

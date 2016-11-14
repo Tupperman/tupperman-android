@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_main);
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
         ActiveAndroid.initialize(config.create());
@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
 
         updateAuthenticationToken();
-        setContentView(R.layout.activity_main);
         mFragmentManager = getSupportFragmentManager();
+
 
         if (mAuthToken == null) {
             setNoUserFragment();
@@ -105,9 +105,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         loadListFragment();
         setTuppers();
     }
@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -213,17 +212,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onQueryTextSubmit(String query) {
         getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(query);
-        return true; //was false
+        return false; //was false
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-//        if (newText.length() == 0) {
-//            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
-//        } else {
+        if (newText.length() == 0) {
+            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
+        } else {
         getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(newText);
-//        }
-        return true; //was false
+        }
+        return false; //was false
     }
 
 
