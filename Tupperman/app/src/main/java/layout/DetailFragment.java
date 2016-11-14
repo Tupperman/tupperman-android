@@ -1,5 +1,7 @@
 package layout;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
@@ -65,8 +67,8 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_details, container, false);
-        setFreezeButton();
-        setExpireButton();
+        setFreezeClickListener();
+        setExpireClickListener();
 
         editTextUUID = (TextInputEditText) mView.findViewById(R.id.editText_uuid);
         editTextDescription = (TextInputEditText) mView.findViewById(R.id.editText_description);
@@ -80,7 +82,10 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
 
             @Override
             public void onClick(View view) {
-                Toast.makeText(mView.getContext(), "Changing UUID is not yet supported.", Toast.LENGTH_LONG).show();
+                ClipboardManager clipboardManager = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("UUID", editTextUUID.getText().toString());
+                clipboardManager.setPrimaryClip(clipData);
+                Toast.makeText(mView.getContext(), "Changing UUID is not yet supported. Copied UUID to Clipboard", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -109,37 +114,41 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
     }
 
     public void saveTupper() {
-        mTupper.uuid = editTextUUID.getText().toString();
-        mTupper.name = editTextName.getText().toString();
-        mTupper.description = editTextDescription.getText().toString();
-        mTupper.weight = editTextWeight.getText().toString().equals("")? 0 : Integer.parseInt(editTextWeight.getText().toString());
-        mTupper.foodGroup = editTextFoodGroups.getText().toString();
-
-        if (isCreate) {
-            mListener.onCreate(mTupper);
+        if (editTextUUID.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "UUID not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextName.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Name not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextDescription.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Description not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextWeight.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Weight not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextFreeze.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Freeze date not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextExpire.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "Expiry date not set!", Toast.LENGTH_LONG).show();
         } else {
-            mListener.onUpdate(mTupper);
+            mTupper.uuid = editTextUUID.getText().toString();
+            mTupper.name = editTextName.getText().toString();
+            mTupper.description = editTextDescription.getText().toString();
+            mTupper.weight = editTextWeight.getText().toString().equals("") ? 0 : Integer.parseInt(editTextWeight.getText().toString());
+            mTupper.foodGroup = editTextFoodGroups.getText().toString();
+
+            if (isCreate) {
+                mListener.onCreate(mTupper);
+            } else {
+                mListener.onUpdate(mTupper);
+            }
+            getActivity().onBackPressed();
         }
-        getActivity().onBackPressed();
     }
 
-    public void deleteTupper(){
+    public void deleteTupper() {
         mListener.onDelete(mTupper);
         getActivity().onBackPressed();
     }
 
 
-//    private void setDeleteButton() {
-//        Button deleteButton = (Button) mView.findViewById(R.id.button_delete_detail);
-//        deleteButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//            }
-//        });
-//    }
-
-    private void setFreezeButton() {
+    private void setFreezeClickListener() {
         if (editTextFreeze == null) {
             editTextFreeze = (TextInputEditText) mView.findViewById(R.id.editText_freezeDate);
         }
@@ -155,7 +164,7 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
         });
     }
 
-    private void setExpireButton() {
+    private void setExpireClickListener() {
         if (editTextExpire == null) {
             editTextExpire = (TextInputEditText) mView.findViewById(R.id.editText_expiryDate);
         }
@@ -171,7 +180,7 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
         });
     }
 
-    public void setTupper(Tupper tupper){
+    public void setTupper(Tupper tupper) {
         if (tupper != null) {
             isCreate = false;
             mTupper = tupper;
