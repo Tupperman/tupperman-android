@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setUpTupperService();
 
         //TODO make config option
-        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
+        mServerCall = ServerCall.newInstance(this);
 
         updateAuthenticationToken();
         mFragmentManager = getSupportFragmentManager();
@@ -295,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+            mServerCall = ServerCall.newInstance(this);
             updateAuthenticationToken();
             initialize();
         }

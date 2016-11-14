@@ -1,6 +1,8 @@
 package ch.tupperman.tupperman.data;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -16,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import ch.tupperman.tupperman.R;
 import ch.tupperman.tupperman.data.callbacks.CreateOrUpdateTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.DeleteTupperCallback;
 import ch.tupperman.tupperman.data.callbacks.GetTuppersCallback;
@@ -38,8 +41,14 @@ public class ServerCall {
 
     public ServerCall(Context context, String endpoint) {
         mRequestQueue = Volley.newRequestQueue(context);
-        mUrl = endpoint;
+        mUrl = endpoint.endsWith("/") ? endpoint : endpoint + "/";
         mTupperFactory = new TupperFactory();
+    }
+
+    public static ServerCall newInstance(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_file_id), Activity.MODE_PRIVATE);
+        String url = sharedPreferences.getString(context.getString(R.string.preferences_key_server_url), context.getString(R.string.preferences_default_url));
+        return new ServerCall(context, url);
     }
 
     public void setToken(String authenticationToken) {

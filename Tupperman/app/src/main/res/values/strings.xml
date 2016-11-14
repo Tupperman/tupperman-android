@@ -55,5 +55,8 @@
     <string name="action_delete">Delete</string>
     <string name="details_foodGroups">Food groups</string>
     <string name="placeholder_repeat_password">Confirm password</string>
+    <string name="placeholder_server_url">Server url</string>
+    <string name="preferences_default_url">http://ark-5.citrin.ch:9080/api</string>
+    <string name="preferences_key_server_url">serverUrl</string>
 
 </resources>

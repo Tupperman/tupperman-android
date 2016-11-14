@@ -30,7 +30,6 @@ public class AccountManagementActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
 
         setContentView(R.layout.activity_account_management);
 
@@ -58,6 +57,7 @@ public class AccountManagementActivity extends AppCompatActivity implements
     public void onClickLogin(User user) {
         mUser = user;
         ((LoginFragment) mActiveFragment).disableUserInterface();
+        mServerCall = ServerCall.newInstance(this);
         mServerCall.authenticate(this, mUser);
     }
 
@@ -86,6 +86,7 @@ public class AccountManagementActivity extends AppCompatActivity implements
     public void onClickRegister(User user) {
         mUser = user;
         ((RegisterFragment) mActiveFragment).disableUserInterface();
+        mServerCall = ServerCall.newInstance(this);
         mServerCall.register(this, mUser);
     }
 
