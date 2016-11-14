@@ -47,18 +47,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SearchView.OnQueryTextListener,
         NoUserFragment.InteractionListener {
 
-    private Intent mServiceIntent;
     private TupperReceiver mTupperReceiver;
     private FragmentManager mFragmentManager;
-    private String tupperFragmentName;
     private String mAuthToken;
     private ServerCall mServerCall;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        tupperFragmentName = getString(R.string.tupperFragment_Tag);
 
         Configuration.Builder config = new Configuration.Builder(this);
         config.addModelClasses(Tupper.class);
@@ -68,14 +64,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //TODO make config option
         mServerCall = new ServerCall(this, "http://ark-5.citrin.ch:9080/api/");
+
         updateAuthenticationToken();
-
         setContentView(R.layout.activity_main);
-
         mFragmentManager = getSupportFragmentManager();
 
         if (mAuthToken == null) {
-            //TODO do this in single activity?
             setNoUserFragment();
         } else {
             loadListFragment();
@@ -107,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.show();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -160,27 +154,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_scanner) {
-            if (mAuthToken !=null) {
-                new IntentIntegrator(this).initiateScan();
-            } else {
-              setNoUserFragment();
-            }
+            loadScannerFragment();
         } else if (id == R.id.nav_tupperlist) {
             loadListFragment();
         } else if (id == R.id.nav_logout) {
-            mAuthToken=null;
-            SharedPreferences preferences = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-
-            editor.putString(getString(R.string.preferences_key_auth_token), null);
-            editor.putString(getString(R.string.preferences_key_email), null);
-            editor.putString(getString(R.string.preferences_key_password), null);
-            editor.apply();
-            setNoUserFragment();
+            logout();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void loadScannerFragment() {
+        if (mAuthToken != null) {
+            new IntentIntegrator(this).initiateScan();
+        } else {
+            setNoUserFragment();
+        }
+    }
+
+    private void loadListFragment() {
+        if (mAuthToken == null) {
+            setNoUserFragment();
+        } else {
+            TupperListFragment tupperListFragment = getTupperFragment();
+            if (tupperListFragment == null) {
+                tupperListFragment = TupperListFragment.newInstance(getAllTuppers());
+            }
+            mFragmentManager.beginTransaction().replace(R.id.content_main, tupperListFragment, getString(R.string.tupperFragment_Tag)).commit();
+            mFragmentManager.executePendingTransactions();
+        }
+    }
+
+    private void logout() {
+        mAuthToken = null;
+        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE).edit();
+        editor.putString(getString(R.string.preferences_key_auth_token), null);
+        editor.putString(getString(R.string.preferences_key_email), null);
+        editor.putString(getString(R.string.preferences_key_password), null);
+        editor.apply();
+        setNoUserFragment();
     }
 
     @Override
@@ -200,20 +213,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onQueryTextSubmit(String query) {
         getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(query);
-        return false;
+        return true; //was false
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (newText.length() == 0) {
-            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
-        }
-        return false;
+//        if (newText.length() == 0) {
+//            getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter("");
+//        } else {
+        getTupperFragment().myTupperRecyclerViewAdapter.getFilter().filter(newText);
+//        }
+        return true; //was false
     }
 
 
     private void setTuppers() {
-        getTupperFragment().setTuppers(this.getAllTuppers());
+        getTupperFragment().setTuppers(getAllTuppers());
 
         mServerCall.getTuppers(new GetTuppersCallback() {
 
@@ -230,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setUpTupperService() {
-        mServiceIntent = new Intent(MainActivity.this, TupperService.class);
+        Intent mServiceIntent = new Intent(MainActivity.this, TupperService.class);
         IntentFilter mStatusIntentFilter = new IntentFilter("ch.tupperman.tupperman.rest");
         PendingIntent pending_intent = PendingIntent.getService(this, 0, mServiceIntent, 0);
         AlarmManager alarm_mgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
@@ -239,22 +254,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LocalBroadcastManager.getInstance(this).registerReceiver(mTupperReceiver, mStatusIntentFilter);
     }
 
-    private void loadListFragment() {
-        if (mAuthToken == null) {
-            setNoUserFragment();
-        } else {
-            TupperListFragment tupperListFragment = getTupperFragment();
-            if (tupperListFragment == null) {
-                tupperListFragment = TupperListFragment.newInstance(this.getAllTuppers());
-            }
-            mFragmentManager.beginTransaction().replace(R.id.content_main, tupperListFragment, tupperFragmentName).commit();
-            mFragmentManager.executePendingTransactions();
-        }
-
-    }
-
     private TupperListFragment getTupperFragment() {
-        return (TupperListFragment) mFragmentManager.findFragmentByTag(tupperFragmentName);
+        return (TupperListFragment) mFragmentManager.findFragmentByTag(getString(R.string.tupperFragment_Tag));
     }
 
 //    public void updateTupperList(Tupper tupper) {
@@ -272,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
             } else {
                 String uuid = result.getContents();
-                List<Tupper> allTuppers = this.getAllTuppers();
+                List<Tupper> allTuppers = getAllTuppers();
                 Tupper match = null;
                 for (Tupper t : allTuppers) {
                     if (t.uuid.equals(uuid)) {
