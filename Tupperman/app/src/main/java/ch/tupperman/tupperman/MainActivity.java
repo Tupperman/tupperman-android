@@ -20,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,10 +29,12 @@ import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ch.tupperman.tupperman.data.ServerCall;
@@ -63,13 +66,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActiveAndroid.initialize(config.create());
 
         setUpTupperService();
-
-        //TODO make config option
         mServerCall = ServerCall.newInstance(this);
-
-        updateAuthenticationToken();
         mFragmentManager = getSupportFragmentManager();
-
+        updateAuthenticationToken();
 
         if (mAuthToken == null) {
             setNoUserFragment();
@@ -79,10 +78,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+//TODO swipe to refresh
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        //TODO improve runtime
+        if (mAuthToken!=null) {
+            setTuppers();
+        }
+    }
+
     private void setNoUserFragment() {
         NoUserFragment fragment = new NoUserFragment();
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.content_main, fragment);
+        if(getTupperFragment()!=null) {
+            fragmentTransaction.remove(getTupperFragment());
+        }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -189,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logout() {
         mAuthToken = null;
+        deleteAllTuppers();
+        getTupperFragment().setTuppers(new ArrayList<Tupper>());
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.hide();
         SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preferences_file_id), MODE_PRIVATE).edit();
         editor.putString(getString(R.string.preferences_key_auth_token), null);
         editor.putString(getString(R.string.preferences_key_email), null);
@@ -241,6 +259,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onSuccess(List<Tupper> tuppers) {
+                deleteAllTuppers();
+                addAllTuppers(tuppers);
                 getTupperFragment().setTuppers(tuppers);
             }
 
@@ -264,13 +284,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TupperListFragment getTupperFragment() {
         return (TupperListFragment) mFragmentManager.findFragmentByTag(getString(R.string.tupperFragment_Tag));
     }
-
-//    public void updateTupperList(Tupper tupper) {
-//        if (!getTupperFragment().exists(tupper)) {
-//            addTupper(tupper);
-//        }
-//        create(tupper);
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -301,11 +314,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-//    @Override
-//    public void onFragmentInteraction(Tupper tupper) {
-//
-//    }
-
     @Override
     public void onClickLogin() {
         startLoginActivity();
@@ -320,6 +328,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return new Select()
                 .from(Tupper.class)
                 .execute();
+    }
+
+    private static void deleteAllTuppers() {
+        new Delete().from(Tupper.class).execute();
+    }
+
+    private static void addAllTuppers(List<Tupper> tuppers) {
+        ActiveAndroid.beginTransaction();
+        try {
+            for (Tupper tupper : tuppers) {
+                tupper.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        } finally {
+            ActiveAndroid.endTransaction();
+        }
     }
 }
 

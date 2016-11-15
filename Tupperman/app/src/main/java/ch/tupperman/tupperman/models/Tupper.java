@@ -1,10 +1,13 @@
 package ch.tupperman.tupperman.models;
 
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,7 +57,7 @@ public class Tupper extends Model implements Serializable {
             jsonTupper.put("name", name);
             jsonTupper.put("description", description);
             jsonTupper.put("weight", weight);
-            jsonTupper.put("foodGroups", foodGroup);
+            jsonTupper.put("foodGroups", buildFoodGroupsArray(foodGroup));
             jsonTupper.put("freezeDate", dateOfFreeze.toString());
             jsonTupper.put("expiryDate", expiryDate.toString());
             return jsonTupper;
@@ -62,5 +65,14 @@ public class Tupper extends Model implements Serializable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private JSONArray buildFoodGroupsArray(String foodGroups){
+        Log.e("FoodGroups", foodGroups); //TODO remove
+        JSONArray jsonArray = new JSONArray();
+        for (String foodGroup : foodGroups.split(",")) {
+            jsonArray.put(foodGroup);
+        }
+        return jsonArray;
     }
 }

@@ -1,8 +1,8 @@
 package ch.tupperman.tupperman;
 
-public interface Constants {
+interface Constants {
 
-    public enum RequestCode {
+    enum RequestCode {
         LOGIN(1), REGISTER(2);
 
         private final int mValue;

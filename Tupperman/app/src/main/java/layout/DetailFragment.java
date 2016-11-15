@@ -126,6 +126,8 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
             Toast.makeText(getContext(), "Freeze date not set!", Toast.LENGTH_LONG).show();
         } else if (editTextExpire.getText().toString().equals("")) {
             Toast.makeText(getContext(), "Expiry date not set!", Toast.LENGTH_LONG).show();
+        } else if (editTextFoodGroups.getText().toString().equals("")) {
+            Toast.makeText(getContext(), "FoodGroups not set!", Toast.LENGTH_LONG).show();
         } else {
             mTupper.uuid = editTextUUID.getText().toString();
             mTupper.name = editTextName.getText().toString();
@@ -140,6 +142,10 @@ public class DetailFragment extends Fragment implements DatePickerFragment.OnDat
             }
             getActivity().onBackPressed();
         }
+    }
+
+    public String getUUID(){
+        return editTextUUID.getText().toString();
     }
 
     public void deleteTupper() {

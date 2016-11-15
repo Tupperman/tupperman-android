@@ -109,16 +109,16 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
         };
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final ImageView mImgView;
-        public final TextView mTitleView;
-        public final TextView mDescriptionView;
-        public final TextView mFreezeView;
-        public final TextView mWeightView;
-        public Tupper mItem;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
+        final ImageView mImgView;
+        final TextView mTitleView;
+        final TextView mDescriptionView;
+        final TextView mFreezeView;
+        final TextView mWeightView;
+        Tupper mItem;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mImgView = (ImageView) view.findViewById(R.id.tupper_card_imageview);

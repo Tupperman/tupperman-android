@@ -21,7 +21,7 @@ public class AccountManagementActivity extends AppCompatActivity implements
         LoginCallback,
         LoginFragment.InteractionListener,
         RegisterCallback,
-        RegisterFragment.InteractionListener{
+        RegisterFragment.InteractionListener {
 
     private ServerCall mServerCall;
     private Fragment mActiveFragment;
@@ -69,7 +69,7 @@ public class AccountManagementActivity extends AppCompatActivity implements
 
     @Override
     public void loginError(LoginCallback.Error error) {
-        if (mActiveFragment instanceof  LoginFragment) {
+        if (mActiveFragment instanceof LoginFragment) {
             ((LoginFragment) mActiveFragment).enableUserInterface();
             switch (error) {
                 case INVALID_CREDENTIALS:

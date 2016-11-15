@@ -1,6 +1,8 @@
 package ch.tupperman.tupperman.models;
 
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +39,8 @@ public class TupperFactory {
             tupper.dateOfFreeze = stringToDate(jsonTupper.getString("freezeDate"));
             tupper.expiryDate = stringToDate(jsonTupper.getString("expiryDate"));
             tupper.weight = jsonTupper.getInt("weight");
+            Log.e("FoodGroups", jsonTupper.getJSONArray("foodGroups").join(",")); //TODO remove loging
+            tupper.foodGroup = jsonTupper.getJSONArray("foodGroups").join(",");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -72,13 +72,16 @@ public class ServerCall {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                String jsonData = new String(error.networkResponse.data);
-                try {
-                    JSONObject jsonObject = new JSONObject(jsonData);
-                    String message = jsonObject.optString("message");
-                    callback.onError(message);
-                } catch (JSONException e) {
-                    callback.onError(jsonData);
+                String jsonData;
+                if (error != null && error.networkResponse != null) {
+                    jsonData = new String(error.networkResponse.data);
+                    try {
+                        JSONObject jsonObject = new JSONObject(jsonData);
+                        String message = jsonObject.optString("message");
+                        callback.onError(message);
+                    } catch (JSONException e) {
+                        callback.onError(jsonData);
+                    }
                 }
             }
         }));
@@ -86,11 +89,11 @@ public class ServerCall {
 
     /**
      * Send a tupper to the server.
-     *
+     * <p>
      * Sending a tupper can be used to create a new as well as to update an existing tupper.
      *
      * @param callback The callback to notify on request completion
-     * @param tupper The tupper to transmit to the server
+     * @param tupper   The tupper to transmit to the server
      */
     public void postTupper(final CreateOrUpdateTupperCallback callback, Tupper tupper) {
         String url = mUrl + ENDPOINT_TUPPERS;
@@ -112,9 +115,9 @@ public class ServerCall {
      * Delete a tupper on the server
      *
      * @param callback The callback to notify on request completion
-     * @param tupper The tupper to delete on the server
+     * @param tupper   The tupper to delete on the server
      */
-    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper){
+    public void deleteTupper(final DeleteTupperCallback callback, Tupper tupper) {
         String url = mUrl + ENDPOINT_TUPPERS + tupper.uuid;
         mRequestQueue.add(new JsonObjectRequestWithToken(Request.Method.DELETE, url, null, mAuthenticationToken, new Response.Listener<JSONObject>() {
             @Override
@@ -124,8 +127,8 @@ public class ServerCall {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-	    callback.onError("Something went wrong during the delete tupper request!");
-	    Log.e(TAG, "deleteTupper: " + error.toString() + "\n" + error.getMessage());
+                callback.onError("Something went wrong during the delete tupper request!");
+                Log.e(TAG, "deleteTupper: " + error.toString() + "\n" + error.getMessage());
             }
         }));
     }
@@ -134,7 +137,7 @@ public class ServerCall {
      * Authenticate a user with the server
      *
      * @param callback The callback to notify on request completion
-     * @param user The user to authenticate
+     * @param user     The user to authenticate
      */
     public void authenticate(final LoginCallback callback, User user) {
         final String urlLogin = mUrl + ENDPOINT_AUTHENTICATE;
@@ -143,7 +146,7 @@ public class ServerCall {
             @Override
             public void onResponse(JSONObject response) {
                 boolean success = response.optBoolean("success", false);
-                if(success) {
+                if (success) {
                     callback.loginSuccess(response.optString("token"));
                 } else {
                     callback.loginError(LoginCallback.Error.UNKNOWN);
@@ -173,7 +176,7 @@ public class ServerCall {
      * Register a new user with the server
      *
      * @param callback The callback to notify on request completion
-     * @param user The user to register
+     * @param user     The user to register
      */
     public void register(final RegisterCallback callback, User user) {
         final String urlRegister = mUrl + ENDPOINT_REGISTER;
@@ -182,7 +185,7 @@ public class ServerCall {
             @Override
             public void onResponse(JSONObject response) {
                 boolean success = response.optBoolean("success", false);
-                if(success) {
+                if (success) {
                     callback.registerSuccess();
                 } else {
                     callback.registerError(RegisterCallback.Error.EMAIL_TAKEN);
@@ -196,7 +199,7 @@ public class ServerCall {
                 try {
                     JSONObject jsonObject = new JSONObject(jsonData);
                     String message = jsonObject.optString("message");
-                    if(message == null) {
+                    if (message == null) {
                         callback.registerError(RegisterCallback.Error.UNKNOWN);
                     } else if (message.endsWith("email address")) {
                         callback.registerError(RegisterCallback.Error.INVALID_EMAIL_ADDRESS);

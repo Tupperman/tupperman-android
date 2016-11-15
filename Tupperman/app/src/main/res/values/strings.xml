@@ -1,23 +1,22 @@
 <resources>
     <string name="app_name">Tupperman</string>
 
+    <!-- Navigation Drawer -->
+    <string name="subtitle">The Tupperware managing app</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
-
-
     <string name="nav_scan">Scan</string>
     <string name="nav_overview">Overview</string>
-    <string name="nav_settings">Settings</string>
-    <string name="cardview_imageview_defaulttext">DefaultIcon</string>
-    <string name="tupperman">Tupperman</string>
-    <string name="subtitle">The Tupperware managing app</string>
-    <string name="details_description">Description</string>
-    <string name="details_uuid">UUID</string>
+    <string name="nav_logout">Logout</string>
+
+    <!-- Menu Edit Activity-->
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+
+    <!-- Menu Search-->
     <string name="hint_search">Search</string>
-    <string name="do_login">Log in</string>
-    <string name="title_activity_login">Sign in</string>
 
     <!-- Intent extras -->
     <string name="extra_account_management_request_type">managementRequestType</string>
@@ -25,6 +24,11 @@
     <!-- Placeholders -->
     <string name="placeholder_password">password</string>
     <string name="placeholder_username">email</string>
+    <string name="details_uuid">UUID</string>
+    <string name="details_name">Name</string>
+    <string name="details_description">Description</string>
+    <string name="details_weight">Weight in g</string>
+    <string name="details_foodGroups">Food groups</string>
 
     <!-- Toasts -->
     <string name="toast_login_failed">Wrong email or password</string>
@@ -38,25 +42,32 @@
     <string name="preferences_key_auth_token">authToken</string>
     <string name="preferences_key_email">email</string>
     <string name="preferences_key_password">password</string>
-    <string name="do_register">Register</string>
-    <string name="no_user">No logged-in user</string>
+
+
+    <!-- Login/Register Activity-->
     <string name="button_login_user">Login to existing account</string>
     <string name="or">or</string>
-    <string name="button_register_user">Register new account</string>
     <string name="title_activity_register">Register</string>
-    <string name="details_name">Name</string>
-    <string name="details_weight">Weight in g</string>
+    <string name="button_register_user">Register new account</string>
+    <string name="do_register">Register</string>
+    <string name="no_user">No logged-in user</string>
+    <string name="do_login">Log in</string>
+    <string name="title_activity_login">Sign in</string>
+
+
+
+
     <string name="title_activity_details">Edit Tupper</string>
-    <string name="extra_tupper_uuid">requestUUID</string>
+    <string name="extra_tupper_uuid">requestTupper</string>
     <string name="tupperFragment_Tag">TUPPER_FRAGMENT</string>
     <string name="detailFragment_Tag">FRAGMENT_DETAIL</string>
-    <string name="nav_logout">Logout</string>
-    <string name="action_save">Save</string>
-    <string name="action_delete">Delete</string>
-    <string name="details_foodGroups">Food groups</string>
+
+    <string name="cardview_imageview_defaulttext">DefaultIcon</string>
     <string name="placeholder_repeat_password">Confirm password</string>
     <string name="placeholder_server_url">Server url</string>
     <string name="preferences_default_url">http://ark-5.citrin.ch:9080/api</string>
     <string name="preferences_key_server_url">serverUrl</string>
+    <string name="edittupperactivity_createtupper">Create Tupper</string>
+    <string name="action_print">Print qr-code</string>
 
 </resources>
