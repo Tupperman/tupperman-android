@@ -111,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                 if (mTupperReceiver.getIsOnline()) {
                     startEditActivity(null);
+                } else {
+                    Toast.makeText(MainActivity.this, "Server not yet connected",Toast.LENGTH_LONG).show();
                 }
             }
         });

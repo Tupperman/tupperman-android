@@ -57,7 +57,7 @@ public class Tupper extends Model implements Serializable {
             jsonTupper.put("name", name);
             jsonTupper.put("description", description);
             jsonTupper.put("weight", weight);
-            jsonTupper.put("foodGroups", buildFoodGroupsArray(foodGroup));
+            jsonTupper.put("foodGroups", foodGroup);
             jsonTupper.put("freezeDate", dateOfFreeze.toString());
             jsonTupper.put("expiryDate", expiryDate.toString());
             return jsonTupper;

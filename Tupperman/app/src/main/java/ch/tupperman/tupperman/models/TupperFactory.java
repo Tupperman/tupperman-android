@@ -39,8 +39,7 @@ public class TupperFactory {
             tupper.dateOfFreeze = stringToDate(jsonTupper.getString("freezeDate"));
             tupper.expiryDate = stringToDate(jsonTupper.getString("expiryDate"));
             tupper.weight = jsonTupper.getInt("weight");
-            Log.e("FoodGroups", jsonTupper.getJSONArray("foodGroups").join(",")); //TODO remove loging
-            tupper.foodGroup = jsonTupper.getJSONArray("foodGroups").join(",");
+            tupper.foodGroup = jsonTupper.getString("foodGroups");
         } catch (JSONException e) {
             e.printStackTrace();
         }
