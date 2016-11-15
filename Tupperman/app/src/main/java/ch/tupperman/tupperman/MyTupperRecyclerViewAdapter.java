@@ -90,13 +90,13 @@ public class MyTupperRecyclerViewAdapter extends RecyclerView.Adapter<MyTupperRe
                     filteredResults = mOriginalValues;
                 } else if (constraint.length() <= lastLength) {
                     for (Tupper tupper : mOriginalValues) {
-                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase()) || tupper.description.toLowerCase().contains(constraint.toString().toLowerCase()) || tupper.foodGroup.toLowerCase().contains(constraint.toString().toLowerCase())) {
                             filteredResults.add(tupper);
                         }
                     }
                 } else {
                     for (Tupper tupper : mValues) {
-                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase())) {
+                        if (tupper.name.toLowerCase().contains(constraint.toString().toLowerCase()) || tupper.description.toLowerCase().contains(constraint.toString().toLowerCase()) || tupper.foodGroup.toLowerCase().contains(constraint.toString().toLowerCase())) {
                             filteredResults.add(tupper);
                         }
                     }
